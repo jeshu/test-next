@@ -170,7 +170,7 @@ export default function EnhancedTable({policyId, data}) {
     <Paper className={classes.paper} elevation={0}>
       <Container className={classes.root}>
         <Typography variant="h4" id="tableTitle" component="h3">
-          Claims History
+          Inspection History
         </Typography>
         <TableContainer>
           <Table

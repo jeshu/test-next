@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const usersList = [{
+const policyHolders = [{
   _id: '0989899',
   username: 'Jeshu Brij',
   policyId: 'AX-1234',
@@ -54,16 +54,40 @@ const usersList = [{
   avtar: '',
 }]
 
+const newCustomer = [
+  {
+    _id: '0989899',
+    username: 'Jeshu Brij',
+    policyId: 'AX-1234',
+    avtar: '',
+  }, {
+    _id: '0989899',
+    username: 'Jeshu Brij',
+    policyId: 'AX-1234',
+    avtar: '',
+  }, {
+    _id: '0989899',
+    username: 'Jeshu Brij',
+    policyId: 'AX-1234',
+    avtar: '',
+  }, {
+    _id: '0989899',
+    username: 'Jeshu Brij',
+    policyId: 'AX-1234',
+    avtar: '',
+  }, 
+]
+
 export default function AlignItemsList() {
   const classes = useStyles();
-
+  const policyHoldersCount = policyHolders.length;
   return (<Grid container
     spacing={0}
     direction="column"
     style={{ minHeight: 'calc(100vh - 64px)', padding:'64px' }}>
       <Typography variant="h4">Policyholders</Typography>
       <List className={classes.root}>
-        {usersList && usersList.map(item =>
+        {policyHolders && policyHolders.map((item, index) =>
           <>
             <ListItem alignItems="flex-start">
               <ListItemAvatar>

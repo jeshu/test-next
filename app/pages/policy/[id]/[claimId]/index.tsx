@@ -34,12 +34,28 @@ export default function ClaimsDetails({ id, claimId }) {
                 color="inherit"
                 gutterBottom
               >
-                Claims Id: {claimId}
+                Inspection Id: {claimId}
               </Typography>
               <Button variant="outlined" color="secondary">
                 Inspect with Droan
              </Button>
             </Grid>
+            <Typography
+              component="h5"
+              variant="h4"
+              color="inherit"
+              gutterBottom
+            >
+              Live stram / Gallery, Zoom
+            </Typography>
+            <ul>
+              <li> input wiht value</li>
+              <li> save CTA  add to inspect history</li>
+              <li> save Cancel  add to inspect history</li>
+              <li> Recommendation/Insights</li>
+              <li> Notify user CTA</li>
+            </ul>
+
           </Grid>
         </Container>
       </Box>
