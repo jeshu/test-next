@@ -16,15 +16,17 @@ import ArrowForward from '@material-ui/icons/ArrowForward';
 import Link from 'next/link';
 
 interface Data {
-  claimId: string,
-  amount: number,
+  inspectionId: string,
+  sumassured: number,
+  inspectionData: number,
 }
 
 function createData(
-  claimId: string,
-  amount: number,
+  inspectionId: string,
+  inspectionData: string,
+  sumassured: number,
 ): Data {
-  return { claimId, amount };
+  return { inspectionId, sumassured, inspectionData };
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -66,8 +68,11 @@ interface HeadCell {
 }
 
 const headCells: HeadCell[] = [
-  { id: 'claimId', numeric: false, disablePadding: true, label: 'Claim ID' },
-  { id: 'amount', numeric: true, disablePadding: false, label: 'Calim Amount(Rs)' }
+  { id: 'inspectionId', numeric: false, disablePadding: true, label: 'Inspection ID' },
+  { id: 'inspectionData', numeric: false, disablePadding: true, label: 'Inspection Date' },
+  { id: 'sumassured', numeric: true, disablePadding: true, label: 'Sum Assured' },
+  { id: 'claimId', numeric: false, disablePadding: true, label: 'Inspection ID' },
+  { id: 'amount', numeric: true, disablePadding: false, label: 'Inspection' }
 ];
 
 interface EnhancedTableProps {

@@ -9,6 +9,7 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '@material-ui/core/IconButton';
+import Box from '@material-ui/core/Box';
 import ArrowForward from '@material-ui/icons/ArrowForward';
 import Typography from '@material-ui/core/Typography';
 import Link from 'next/link';
@@ -24,6 +25,9 @@ const useStyles = makeStyles((theme: Theme) =>
     inline: {
       display: 'inline',
     },
+    bottemGap: {
+      marginBottom: theme.spacing(4)
+    }
   }),
 );
 
@@ -60,64 +64,108 @@ const newCustomer = [
     username: 'Jeshu Brij',
     policyId: 'AX-1234',
     avtar: '',
+    status: 'inspect',
   }, {
     _id: '0989899',
     username: 'Jeshu Brij',
     policyId: 'AX-1234',
     avtar: '',
+    status: 'approve',
   }, {
     _id: '0989899',
     username: 'Jeshu Brij',
     policyId: 'AX-1234',
     avtar: '',
-  }, {
-    _id: '0989899',
-    username: 'Jeshu Brij',
-    policyId: 'AX-1234',
-    avtar: '',
-  }, 
+    status: 'inspect',
+  }
 ]
 
 export default function AlignItemsList() {
   const classes = useStyles();
-  const policyHoldersCount = policyHolders.length;
   return (<Grid container
     spacing={0}
     direction="column"
-    style={{ minHeight: 'calc(100vh - 64px)', padding:'64px' }}>
-      <Typography variant="h4">Policyholders</Typography>
-      <List className={classes.root}>
-        {policyHolders && policyHolders.map((item, index) =>
-          <>
-            <ListItem alignItems="flex-start">
-              <ListItemAvatar>
-                <Avatar alt={item.username} src={item.avtar} />
-              </ListItemAvatar>
-              <ListItemText
-                primary={item.username}
-                secondary={
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    className={classes.inline}
-                    color="textPrimary"
-                  >
-                    {item.policyId}
-                  </Typography>
-                }
-              />
-              <Link href={`policy/${item._id}`}>
+    style={{ minHeight: 'calc(100vh - 64px)', padding: '64px' }}>
+      <Box className={classes.bottemGap}>
+        
+    <Typography variant="h4">New Customer</Typography>
+    <List className={classes.root}>
+      {newCustomer && newCustomer.map((item, index) =>
+        <>
+          <ListItem alignItems="flex-start">
+            <ListItemAvatar>
+              <Avatar alt={item.username} src={item.avtar} />
+            </ListItemAvatar>
+            <ListItemText
+              primary={item.username}
+              secondary={
+                <Typography
+                  component="span"
+                  variant="body2"
+                  className={classes.inline}
+                  color="textPrimary"
+                >
+                  {item.policyId}
+                </Typography>
+              }
+            />
               <ListItemSecondaryAction>
-              <IconButton edge="end" aria-label="comments">
-                <ArrowForward />
-              </IconButton>
-            </ListItemSecondaryAction>
-              </Link>
-            </ListItem>
-            <Divider variant="inset" component="li" />
-          </>
-        )}
-      </List>
+              <Typography
+                  component="span"
+                  variant="body2"
+                  className={classes.inline}
+                  color="textSecondary"
+                >
+                  {item.status.toUpperCase()}
+                </Typography>
+            <Link href={`policy/${item._id}`}>
+                <IconButton edge="end" aria-label="comments">
+                  <ArrowForward />
+                </IconButton>
+            </Link>
+              </ListItemSecondaryAction>
+          </ListItem>
+          {((newCustomer.length -1) !== index) ? <Divider variant="inset" component="li" />:null}
+        </>
+      )}
+    </List>
+    
+    </Box>
+    <Box>
+      <Typography variant="h4">Policyholders</Typography>
+    <List className={classes.root}>
+      {policyHolders && policyHolders.map((item, index) =>
+        <>
+          <ListItem alignItems="flex-start">
+            <ListItemAvatar>
+              <Avatar alt={item.username} src={item.avtar} />
+            </ListItemAvatar>
+            <ListItemText
+              primary={item.username}
+              secondary={
+                <Typography
+                  component="span"
+                  variant="body2"
+                  className={classes.inline}
+                  color="textPrimary"
+                >
+                  {item.policyId}
+                </Typography>
+              }
+            />
+            <Link href={`policy/${item._id}`}>
+              <ListItemSecondaryAction>
+                <IconButton edge="end" aria-label="comments">
+                  <ArrowForward />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </Link>
+          </ListItem>
+          {((policyHolders.length -1) !== index) ? <Divider variant="inset" component="li" />:null}
+        </>
+      )}
+    </List>
+    </Box>
   </Grid>
   );
 }
