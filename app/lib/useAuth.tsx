@@ -27,12 +27,10 @@ function useProvideAuth() {
 
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
-  
+
   const signIn = async (email, password) => {
     console.log(`signIn called, ${email} ${password}`);
     if (email === 'jeshu911@gmail.com' && password === 'password') {
-      // await setTimeout(() => {
-      // }, 300);
       sessionStorage.setItem('token', '123456');
       sessionStorage.setItem('user', 'jeshu911@gmail.com');
       setUser({email, policyId:'AX-258963', _id:'ax-9887'})
