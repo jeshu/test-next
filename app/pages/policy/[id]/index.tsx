@@ -40,27 +40,50 @@ const policyData = [{
   value: '1st Jan 2020',
 },]
 
-const policyClaimsList = [{
-  _id: '0001',
-  claimId: '2315648',
-  amount: '12456',
-  currency: 'Rs'
-},{
-  _id: '0001',
-  claimId: '2315648',
-  amount: '12456',
-  currency: 'Rs'
-},{
-  _id: '0001',
-  claimId: '2315648',
-  amount: '12456',
-  currency: 'Rs'
-},{
-  _id: '0001',
-  claimId: '2315648',
-  amount: '12456',
-  currency: 'Rs'
-},]
+const policyClaimsList = [
+  {
+    "_id": "60351a68ad74c204749455b5",
+    "sumAssured": "1,232.35",
+    "inspectionDate": "Wednesday, August 6, 2014 12:07 PM",
+    "inspectionId": 37839,
+    "currency": "Rs"
+  },
+  {
+    "_id": "60351a687d7337b6d7a94ad1",
+    "sumAssured": "3,335.36",
+    "inspectionDate": "Wednesday, January 29, 2020 2:51 PM",
+    "inspectionId": 37840,
+    "currency": "Rs"
+  },
+  {
+    "_id": "60351a68754f0d4391adb0a9",
+    "sumAssured": "1,589.37",
+    "inspectionDate": "Saturday, February 1, 2014 6:05 AM",
+    "inspectionId": 37841,
+    "currency": "Rs"
+  },
+  {
+    "_id": "60351a68bf0eb8e0324c8203",
+    "sumAssured": "3,247.74",
+    "inspectionDate": "Tuesday, August 7, 2018 6:25 PM",
+    "inspectionId": 37842,
+    "currency": "Rs"
+  },
+  {
+    "_id": "60351a688182ba844ce1fe8f",
+    "sumAssured": "3,109.47",
+    "inspectionDate": "Thursday, January 21, 2021 6:02 PM",
+    "inspectionId": 37843,
+    "currency": "Rs"
+  },
+  {
+    "_id": "60351a68a76cd768833c0c00",
+    "sumAssured": "2,821.20",
+    "inspectionDate": "Wednesday, February 4, 2015 8:04 PM",
+    "inspectionId": 37844,
+    "currency": "Rs"
+  }
+]
 
 
 export default function PolicyDetails({ id }) {

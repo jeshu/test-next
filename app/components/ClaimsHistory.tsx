@@ -17,16 +17,16 @@ import Link from 'next/link';
 
 interface Data {
   inspectionId: string,
-  sumassured: number,
-  inspectionData: number,
+  inspectionDate: string,
+  sumAssured: number,
 }
 
 function createData(
   inspectionId: string,
-  inspectionData: string,
-  sumassured: number,
+  inspectionDate: string,
+  sumAssured: number,
 ): Data {
-  return { inspectionId, sumassured, inspectionData };
+  return { inspectionId, sumAssured, inspectionDate };
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -69,10 +69,8 @@ interface HeadCell {
 
 const headCells: HeadCell[] = [
   { id: 'inspectionId', numeric: false, disablePadding: true, label: 'Inspection ID' },
-  { id: 'inspectionData', numeric: false, disablePadding: true, label: 'Inspection Date' },
-  { id: 'sumassured', numeric: true, disablePadding: true, label: 'Sum Assured' },
-  { id: 'claimId', numeric: false, disablePadding: true, label: 'Inspection ID' },
-  { id: 'amount', numeric: true, disablePadding: false, label: 'Inspection' }
+  { id: 'inspectionDate', numeric: false, disablePadding: true, label: 'Inspection Date' },
+  { id: 'sumAssured', numeric: true, disablePadding: true, label: 'Sum Assured' },
 ];
 
 interface EnhancedTableProps {
@@ -151,10 +149,10 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export default function EnhancedTable({policyId, data}) {
-  const rows = data && data.map(row => createData(row.claimId, row.amount))
+  const rows = data && data.map(row => createData(row.inspectionId, row.sumAssured, row.inspectionDate))
   const classes = useStyles();
   const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('claimId');
+  const [orderBy, setOrderBy] = React.useState<keyof Data>('inspectionId');
   const [selected, setSelected] = React.useState<string[]>([]);
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
@@ -201,14 +199,15 @@ export default function EnhancedTable({policyId, data}) {
                     <TableRow
                       hover
                       tabIndex={-1}
-                      key={row.claimId}
+                      key={row.inspectionId}
                     >
                       <TableCell component="th" scope="row" padding="none">
-                        {row.claimId}
+                        {row.inspectionId}
                       </TableCell>
-                      <TableCell align="right">{row.amount}</TableCell>
+                      <TableCell align="left">{row.sumAssured}</TableCell>
+                      <TableCell align="right">{row.inspectionDate}</TableCell>
                       <TableCell align="right">
-                        <Link href={`/policy/${policyId}/${row.claimId}`}>
+                        <Link href={`/policy/${policyId}/${row.inspectionId}`}>
                           <IconButton><ArrowForward /></IconButton>
                         </Link>
                       </TableCell>

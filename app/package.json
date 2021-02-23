@@ -8,14 +8,17 @@
     "build": "next build",
     "start": "next start"
   },
+  "browser": { "fs": false, "path": false, "os": false},
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
+    "azure-storage": "^2.10.3",
     "next": "^10.0.7",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react-dom": "^17.0.1",
+    "react-zoom-slider": "^0.1.0"
   },
   "devDependencies": {
     "@types/node": "^14.14.31",
