@@ -10,8 +10,15 @@ import Paper from '@material-ui/core/Paper';
 
 const useStyles = makeStyles({
   table: {
-    minWidth: 650,
+    maxWidth: '100%',
+    overflow: 'hidden'
   },
+  image: {
+    maxWidth: '100px',
+    maxHeight: '100px',
+    outline: '4px solid black',
+    padding: '2px',
+  }
 });
 
 interface DroneData {
@@ -23,15 +30,16 @@ interface DroneData {
   "water": string
 }
 
-function createData(index:string, temperature:string, wheateArea:string, humidity:string, wasteLand:string, water:string) {
-  return { index, temperature, wheateArea, humidity, wasteLand, water};
+function createData(index: string, temperature: string, wheateArea: string, humidity: string, wasteLand: string, water: string) {
+  return { index, temperature, wheateArea, humidity, wasteLand, water };
 }
 
 const DoranDataTable = ({ data }) => {
   const classes = useStyles();
-  const rows = data && data.map((row:DroneData) => {
-    const {index, temperature, wheateArea, humidity, wasteLand, water}  = row;
-    return createData(index, temperature, wheateArea, humidity, wasteLand, water)})
+  const rows = data && data.map((row: DroneData) => {
+    const { index, temperature, wheateArea, humidity, wasteLand, water } = row;
+    return createData(index, temperature, wheateArea, humidity, wasteLand, water)
+  })
   return (
     <TableContainer>
       <Table className={classes.table} aria-label="simple table">
@@ -40,6 +48,7 @@ const DoranDataTable = ({ data }) => {
             {rows && rows[0] && Object.keys(rows[0]).map((_key, index) => (
               <TableCell align={index === 0 ? 'left' : 'center'}>{_key.toUpperCase()}</TableCell>
             ))}
+            <TableCell align='center'>Image</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -50,6 +59,11 @@ const DoranDataTable = ({ data }) => {
                   {_value}
                 </TableCell>)
               )}
+              <TableCell align='center'>
+                <a href='https://images.unsplash.com/photo-1437252611977-07f74518abd7?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8d2hlYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&w=1000&q=80' target="_blank">
+                  <img className={classes.image} src="https://images.unsplash.com/photo-1437252611977-07f74518abd7?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8d2hlYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&w=1000&q=80" />
+                </a>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

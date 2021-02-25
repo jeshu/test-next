@@ -130,10 +130,10 @@ export default function ClaimsDetails({ id, claimId }) {
                 Inspection Id: {claimId}
               </Typography>
               <Button variant="outlined" color="secondary">
-                Inspect with Droan
+                Start Inspection
              </Button>
             </Grid>
-            <Grid item xs={12} md={6} className={classes.sliderBase}>
+            <Grid item xs={12}  className={classes.sliderBase}>
               <Typography
                 component="h5"
                 variant="h5"
@@ -142,14 +142,14 @@ export default function ClaimsDetails({ id, claimId }) {
               >
                 Feeds from Doran
             </Typography>
-              <SliderImage
+              {/* <SliderImage
                 data={imgData}
                 width="100%"
                 showDescription={false}
                 direction="right"
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={6}> */}
               <DoranDataTable data={doranData} />
             </Grid>
           </Grid>
