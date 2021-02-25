@@ -3,33 +3,22 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import Alert from '@material-ui/lab/Alert';
 import Hero from 'components/Hero';
 import DoranDataTable from 'components/DoranDataTable';
 import { makeStyles } from '@material-ui/core/styles';
-import SliderImage from 'react-zoom-slider';
-import azure from 'azure-storage';
-
-const imgData = [
-  {
-    image: 'https://source.unsplash.com/random/400x300?wheat',
-    text: 'img1'
-  },
-  {
-    image: 'https://source.unsplash.com/random/400x300?wheat',
-    text: 'img1'
-  },
-  {
-    image: 'https://source.unsplash.com/random/400x300?wheat',
-    text: 'img1'
-  },
-];
-
-//react-slider__ul
 
 const useStyles = makeStyles((theme) => ({
   sliderBase: {
     '& .react-slider__ul': {
       display: 'none',
+    }
+  },
+  alert: {
+    display: 'flex',
+    alignItems:'center',
+    '& button':{
+      marginLeft:theme.spacing(2)
     }
   }
 }))
@@ -103,20 +92,11 @@ const doranData = [
 
 export default function ClaimsDetails({ id, claimId }) {
   const classes = useStyles();
-  const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-  const tableQuery = new azure.TableQuery().top(10)
-  
-  tableService.queryEntities('Field', tableQuery, null, function (error, result, response) {
-    if (!error) {
-      result.entries.forEach(function (field:any, index:number) {
-        console.log(field, index);
-      });
-    }
-  });
 
   return (
     <>
-      <Hero title="Brijesh Kumar" subtext={`Policy no: AX-${id}`} ctalink={{ label: 'Summery', url: `/policy/${id}` }} />
+      <Hero title="Brijesh Kumar" subtext={`Policy no: AX-${id}`} ctalink={{ label: 'Policy information', url: `/policy/${id}` }} ctaSecLink={{ label: 'Personal information', url: `/policy/${id}/personalinfo` }} />
+
       <Box>
         <Container>
           <Grid container spacing={3}>
@@ -133,7 +113,16 @@ export default function ClaimsDetails({ id, claimId }) {
                 Start Inspection
              </Button>
             </Grid>
-            <Grid item xs={12}  className={classes.sliderBase}>
+            <Grid item xs={12} className={classes.sliderBase}>
+              <Box >
+                <Alert severity="info" className={classes.alert}>This is the recommendation for the farmer.
+                <Button variant="outlined" color="secondary">
+                    Notify
+                </Button>
+                </Alert>
+              </Box>
+            </Grid>
+            <Grid item xs={12} className={classes.sliderBase}>
               <Typography
                 component="h5"
                 variant="h5"
@@ -142,15 +131,10 @@ export default function ClaimsDetails({ id, claimId }) {
               >
                 Feeds from Doran
             </Typography>
-              {/* <SliderImage
-                data={imgData}
-                width="100%"
-                showDescription={false}
-                direction="right"
-              />
-            </Grid>
-            <Grid item xs={12} md={6}> */}
               <DoranDataTable data={doranData} />
+            </Grid>
+            <Grid item xs={12} md={6}> 
+              Recomadations...
             </Grid>
           </Grid>
         </Container>

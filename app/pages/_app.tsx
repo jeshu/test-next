@@ -4,6 +4,7 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import { themeDark, themeLight } from "lib/theme";
 import { useEffect, useState } from "react";
 import { AuthProvider } from 'lib/useAuth';
+import { DroanStorageProvider } from 'lib/useDroanStorage';
 import Header from 'components/Header';
 
 export default function MyApp(props) {
@@ -25,10 +26,12 @@ export default function MyApp(props) {
   return (
     <ThemeProvider theme={darkState ? themeDark : themeLight}>
       <CssBaseline />
-      <AuthProvider>
-      <Header darkState={darkState} handleThemeChange={handleThemeChange} />
-        <Component {...pageProps} />
-      </AuthProvider>
+      <DroanStorageProvider>
+        <AuthProvider>
+          <Header darkState={darkState} handleThemeChange={handleThemeChange} />
+          <Component {...pageProps} />
+        </AuthProvider>
+      </DroanStorageProvider>
     </ThemeProvider>
   );
 }

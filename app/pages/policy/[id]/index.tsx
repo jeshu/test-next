@@ -7,6 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Hero from 'components/Hero';
 import ClaimsHistory from 'components/ClaimsHistory';
 
+
 const policyData = [{
   label: 'Farm area',
   unit: 'acres',
@@ -91,7 +92,7 @@ export default function PolicyDetails({ id }) {
   const styles = useStyles();
   return (
     <>
-      <Hero title="Brijesh Kumar" subtext={`Policy no: AX-${id}`} ctalink={{ label: 'Personal information', url: `/policy/${id}/personalinfo` }} />
+      <Hero title="Brijesh Kumar" subtext={`Policy no: AX-${id}`} ctalink={{ label: 'Policy information', url: `/policy/${id}` }} ctaSecLink={{ label: 'Personal information', url: `/policy/${id}/personalinfo` }} />
       <Box>
         <Container>
           <Grid container spacing={3}>
@@ -129,7 +130,7 @@ export default function PolicyDetails({ id }) {
         </Container>
       </Box>
       <Box>
-        <ClaimsHistory data={policyClaimsList} policyId={id} />
+        <ClaimsHistory policyId={id} />
       </Box>
     </>
   );

@@ -10,7 +10,7 @@ import { useAuth } from 'lib/useAuth';
 
 
 export default function Hero({
-  title, subtext, ctalink
+  title, subtext, ctalink, ctaSecLink
 }) {
   const styles = useStyles();
   const { user = { emial: 'none', policyId: 'someid' } } = useAuth();
@@ -38,6 +38,12 @@ export default function Hero({
               {ctalink?.label}
                 </Button>
             </Link>
+
+            {ctaSecLink && <Link href={`${ctaSecLink?.url}`}>
+              <Button variant="outlined" color="inherit">
+              {ctaSecLink?.label}
+                </Button>
+            </Link>}
           </div>
         </Grid>
       </Grid>

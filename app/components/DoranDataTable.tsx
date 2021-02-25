@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TableContainer from '@material-ui/core/TableContainer';
 import Table from '@material-ui/core/Table';
@@ -6,6 +6,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import { useDroanStorage} from 'lib/useDroanStorage';
 import Paper from '@material-ui/core/Paper';
 
 const useStyles = makeStyles({
@@ -34,12 +35,13 @@ function createData(index: string, temperature: string, wheateArea: string, humi
   return { index, temperature, wheateArea, humidity, wasteLand, water };
 }
 
-const DoranDataTable = ({ data }) => {
+const DoranDataTable = () => {
+  const { data, fetch } = useDroanStorage()
   const classes = useStyles();
-  const rows = data && data.map((row: DroneData) => {
-    const { index, temperature, wheateArea, humidity, wasteLand, water } = row;
-    return createData(index, temperature, wheateArea, humidity, wasteLand, water)
-  })
+  const rows:any = data || [];
+  useEffect(() => {
+    fetch('id')
+  }, [])
   return (
     <TableContainer>
       <Table className={classes.table} aria-label="simple table">
