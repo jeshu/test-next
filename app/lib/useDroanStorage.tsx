@@ -40,23 +40,21 @@ function useProvideDroanStorage() {
   const [droanData, setDroanData] = useState(null);
   const [error, setError] = useState('');
 
-  const fetch = () => {
+  const fetch = (inspectionId:string) => {
     const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
     const tableQuery = new azure.TableQuery().top(10)
 
     tableService.queryEntities('Field', tableQuery, null, function (error, result, response) {
       if (!error) {
         const parsedData = result.entries.map(dataParser);
-        console.log(parsedData);
-        
         setDroanData(parsedData)
       }
     });
   }
-  const insert = () => {
+  const insert = (inspectionId: string) => {
 
   }
-  const update = () => {
+  const update = (data:any) => {
 
   }
   return {

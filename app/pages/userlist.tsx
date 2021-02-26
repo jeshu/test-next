@@ -9,6 +9,7 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import ArrowForward from '@material-ui/icons/ArrowForward';
 import Typography from '@material-ui/core/Typography';
@@ -110,14 +111,15 @@ export default function AlignItemsList() {
               }
             />
               <ListItemSecondaryAction>
-              <Typography
-                  component="span"
-                  variant="body2"
-                  className={classes.inline}
-                  color="textSecondary"
-                >
-                  {item.status.toUpperCase()}
-                </Typography>
+                <Link href={`/policy/${item.policyId}`}>
+                <Button
+                    variant="body2"
+                    className={classes.inline}
+                    color="textSecondary"
+                  >
+                    {item.status.toUpperCase()}
+                  </Button>
+                </Link>
             <Link href={`policy/${item._id}`}>
                 <IconButton edge="end" aria-label="comments">
                   <ArrowForward />
