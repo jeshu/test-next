@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -14,6 +14,7 @@ import Box from '@material-ui/core/Box';
 import ArrowForward from '@material-ui/icons/ArrowForward';
 import Typography from '@material-ui/core/Typography';
 import Link from 'next/link';
+import { useCustomerStorage } from 'lib/useCustomerData';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,57 +33,28 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const policyHolders = [{
-  _id: '0989899',
-  username: 'Jeshu Brij',
-  policyId: 'AX-1234',
-  avtar: '',
-}, {
-  _id: '0989899',
-  username: 'Jeshu Brij',
-  policyId: 'AX-1234',
-  avtar: '',
-}, {
-  _id: '0989899',
-  username: 'Jeshu Brij',
-  policyId: 'AX-1234',
-  avtar: '',
-}, {
-  _id: '0989899',
-  username: 'Jeshu Brij',
-  policyId: 'AX-1234',
-  avtar: '',
-}, {
-  _id: '0989899',
-  username: 'Jeshu Brij',
-  policyId: 'AX-1234',
-  avtar: '',
-}]
-
-const newCustomer = [
-  {
-    _id: '0989899',
-    username: 'Jeshu Brij',
-    policyId: 'AX-1234',
-    avtar: '',
-    status: 'inspect',
-  }, {
-    _id: '0989899',
-    username: 'Jeshu Brij',
-    policyId: 'AX-1234',
-    avtar: '',
-    status: 'approve',
-  }, {
-    _id: '0989899',
-    username: 'Jeshu Brij',
-    policyId: 'AX-1234',
-    avtar: '',
-    status: 'inspect',
-  }
-]
-
-export default function AlignItemsList() {
+export default function Customer() {
   const classes = useStyles();
+  const { data, fetchAll } = useCustomerStorage();
+  
+  const [newCustomer, setNewCustomer] = useState(null)
+  const [policyHolders, setPolicyHolders] = useState(null)
+  useEffect(() => {
+    fetchAll()
+  }, [])
+
+  useEffect(()=> {
+    if(data) {
+      setNewCustomer(data.filter((c:any) => c.inspectionPending === 'true'))
+      setPolicyHolders(data.filter((c:any) => c.inspectionPending === 'false'))
+      console.log(data);    
+    }
+  }, [data])
+  useEffect(()=> {
+    console.log(newCustomer, policyHolders);
+    
+  }, [newCustomer, policyHolders])
+
   return (<Grid container
     spacing={0}
     direction="column"
@@ -93,34 +65,25 @@ export default function AlignItemsList() {
     <List className={classes.root}>
       {newCustomer && newCustomer.map((item, index) =>
         <>
-          <ListItem alignItems="flex-start">
+          <ListItem alignItems="flex-start" key={item.id}>
             <ListItemAvatar>
-              <Avatar alt={item.username} src={item.avtar} />
+              <Avatar alt={item.name} src={item.avtar} />
             </ListItemAvatar>
             <ListItemText
-              primary={item.username}
+              primary={item.name}
               secondary={
                 <Typography
                   component="span"
                   variant="body2"
                   className={classes.inline}
-                  color="textPrimary"
+                  color="primary"
                 >
-                  {item.policyId}
+                  {item.id}
                 </Typography>
               }
             />
               <ListItemSecondaryAction>
-                <Link href={`/policy/${item.policyId}`}>
-                <Button
-                    variant="body2"
-                    className={classes.inline}
-                    color="textSecondary"
-                  >
-                    {item.status.toUpperCase()}
-                  </Button>
-                </Link>
-            <Link href={`policy/${item._id}`}>
+            <Link href={`policy/${item.id}`}>
                 <IconButton edge="end" aria-label="comments">
                   <ArrowForward />
                 </IconButton>
@@ -140,10 +103,10 @@ export default function AlignItemsList() {
         <>
           <ListItem alignItems="flex-start">
             <ListItemAvatar>
-              <Avatar alt={item.username} src={item.avtar} />
+              <Avatar alt={item.name} src={item.avtar} />
             </ListItemAvatar>
             <ListItemText
-              primary={item.username}
+              primary={item.name}
               secondary={
                 <Typography
                   component="span"
@@ -155,7 +118,7 @@ export default function AlignItemsList() {
                 </Typography>
               }
             />
-            <Link href={`policy/${item._id}`}>
+            <Link href={`policy/${item.id}`}>
               <ListItemSecondaryAction>
                 <IconButton edge="end" aria-label="comments">
                   <ArrowForward />

@@ -9,9 +9,8 @@ import { useAuth } from 'lib/useAuth';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
-  background: {
-    backgroundImage: 'url(https://unsplash.com/photos/zMJYmwca-_k)',
-    backgroundSize: 'cover',
+  cover: {
+    backgroundImage: 'url(https://images.unsplash.com/photo-1573744271804-5bbfe6ee19da?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&dl=ali-yilmaz-hbYrBY8eVMc-unsplash.jpg)',    backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'center',
   }
@@ -30,8 +29,9 @@ export default function SignIn() {
 
   const styles = useStyles();
   return (
-    <Box className={styles.background}>
+    <Box >
       <Grid container
+        className={styles.cover}
         spacing={0}
         direction="column"
         alignItems="center"

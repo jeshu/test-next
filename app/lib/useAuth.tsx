@@ -1,4 +1,4 @@
-import { useState, useContext, createContext } from 'react';
+import { useState, useContext, createContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 type AuthProps = {
@@ -23,18 +23,21 @@ export const useAuth = () => {
 
 function useProvideAuth() {
   const router = useRouter();
-  
-
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
 
+  useEffect(() => {
+    console.log(user, sessionStorage.getItem(user));
+    
+    
+  }, [])
   const signIn = async (email, password) => {
     console.log(`signIn called, ${email} ${password}`);
     if (email === 'jeshu911@gmail.com' && password === 'password') {
       sessionStorage.setItem('token', '123456');
       sessionStorage.setItem('user', 'jeshu911@gmail.com');
       setUser({email, policyId:'AX-258963', _id:'ax-9887'})
-      router.push('/userlist');
+      router.push('/customers');
     } else {
       setError("Invalid Login");
     }

@@ -23,79 +23,12 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const doranData = [
-  {
-    "index": 20,
-    "temperature": "35.5",
-    "humidity": "83.3",
-    "wheateArea": 83,
-    "wasteLand": 26,
-    "water": 19
-  },
-  {
-    "index": 21,
-    "temperature": "35.1",
-    "humidity": "81.8",
-    "wheateArea": 84,
-    "wasteLand": 10,
-    "water": 2
-  },
-  {
-    "index": 22,
-    "temperature": "37.0",
-    "humidity": "82.5",
-    "wheateArea": 75,
-    "wasteLand": 23,
-    "water": 16
-  },
-  {
-    "index": 23,
-    "temperature": "36.8",
-    "humidity": "84.3",
-    "wheateArea": 90,
-    "wasteLand": 15,
-    "water": 20
-  },
-  {
-    "index": 24,
-    "temperature": "36.1",
-    "humidity": "80.3",
-    "wheateArea": 83,
-    "wasteLand": 15,
-    "water": 8
-  },
-  {
-    "index": 25,
-    "temperature": "36.6",
-    "humidity": "82.2",
-    "wheateArea": 84,
-    "wasteLand": 20,
-    "water": 12
-  },
-  {
-    "index": 26,
-    "temperature": "36.6",
-    "humidity": "80.1",
-    "wheateArea": 82,
-    "wasteLand": 20,
-    "water": 16
-  },
-  {
-    "index": 27,
-    "temperature": "36.7",
-    "humidity": "80.6",
-    "wheateArea": 71,
-    "wasteLand": 21,
-    "water": 5
-  }
-]
-
 export default function ClaimsDetails({ id, claimId }) {
   const classes = useStyles();
 
   return (
     <>
-      <Hero title="Brijesh Kumar" subtext={`Policy no: AX-${id}`} ctalink={{ label: 'Policy information', url: `/policy/${id}` }} ctaSecLink={{ label: 'Personal information', url: `/policy/${id}/personalinfo` }} />
+      <Hero title="Brijesh Kumar" subtext={`User Id: ${id}`} ctalink={{ label: 'Policy information', url: `/policy/${id}` }} ctaSecLink={{ label: 'Personal information', url: `/policy/${id}/personalinfo` }} />
 
       <Box>
         <Container>

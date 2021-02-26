@@ -5,7 +5,7 @@ import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 
 function PersonalInfo({
-  email, age, gender, mobile, address, location, experience, typeOfCrop
+  email, age, gender, mobile, address, location, experience, cropType
 }) {
   return (
     <Box>
@@ -173,7 +173,7 @@ function PersonalInfo({
               color="inherit"
               gutterBottom
             >
-              {typeOfCrop}
+              {cropType}
             </Typography>
           </Grid>
         </Grid>
