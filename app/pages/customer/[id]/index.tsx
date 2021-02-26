@@ -23,7 +23,7 @@ export default function CustomerDetails({ id }) {
         title={personalinfo?.name} 
         subtext={`User Id: ${personalinfo?.userId ?? ''}`} 
         ctalink={{ label: 'Policy information', url: `/policy/${id}` }} 
-        ctaSecLink={{ label: 'Personal information', url: `/customer/${id}/details` }} 
+        ctaSecLink={{ label: 'Request Inspection', url: `/customer/${id}/inspection/new` }} 
       />
       <PersonalInfo {...personalinfo} />
       <Box>
