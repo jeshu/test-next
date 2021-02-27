@@ -40,6 +40,10 @@ export default function NewCustomer() {
   const [address, setAddress] = useState('');
   const [experience, setExperience] = useState('');
   const [cropType, setCropType] = useState('');
+  const [farmArea, setFarmArea] = useState('');
+  const [expectedYeild, setExpectedYeild] = useState('');
+  const [expectedMarketPrice, setExpectedMarketPrice] = useState('');
+  const [coveragePeriod, setCoveragePeriod] = useState('');
 
   const styles = useStyles();
   return (
@@ -135,6 +139,46 @@ export default function NewCustomer() {
               value={experience}
               onChange={(e) => setExperience(e.target.value)}
               className="form-control"
+              label="Experience"
+              fullWidth={true}
+              required
+            />
+            <Box pb={2.5} />
+            <TextField
+              value={farmArea}
+              onChange={(e) => setFarmArea(e.target.value)}
+              className="form-control"
+              type='number'
+              label="Farm Area"
+              fullWidth={true}
+              required
+            />
+            <Box pb={2.5} />
+            <TextField
+              value={expectedYeild}
+              onChange={(e) => setExpectedYeild(e.target.value)}
+              className="form-control"
+              type='number'
+              label="Expected Yeild"
+              fullWidth={true}
+              required
+            />
+            <Box pb={2.5} />
+            <TextField
+              value={expectedMarketPrice}
+              onChange={(e) => setExpectedMarketPrice(e.target.value)}
+              type='number'
+              className="form-control"
+              label="Expected market price"
+              fullWidth={true}
+              required
+            />
+            <Box pb={2.5} />
+            <TextField
+              value={coveragePeriod}
+              onChange={(e) => setCoveragePeriod(e.target.value)}
+              className="form-control"
+              type='number'
               label="Experience"
               fullWidth={true}
               required

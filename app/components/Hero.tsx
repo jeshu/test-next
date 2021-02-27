@@ -4,23 +4,22 @@ import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles} from '@material-ui/core/styles';
 
 import { useAuth } from 'lib/useAuth';
-
 
 export default function Hero({
   title, subtext, ctalink, ctaSecLink
 }) {
-  const styles = useStyles();
+  const classes = useStyles()
   const { user = { emial: 'none', policyId: 'someid' } } = useAuth();
 
   return (
-    <Paper className={styles.mainFeaturedPost}>
-      <div className={styles.overlay} />
+    <Paper className={classes.mainFeaturedPost}>
+      <div className={classes.overlay} />
       <Grid container>
         <Grid item md={6}>
-          <div className={styles.mainFeaturedPostContent}>
+          <div className={classes.mainFeaturedPostContent}>
             <Typography
               component="h1"
               variant="h3"
@@ -40,7 +39,7 @@ export default function Hero({
             </Link>
 
             {ctaSecLink && <Link href={`${ctaSecLink?.url}`}>
-              <Button variant="outlined" color="inherit">
+              <Button variant="outlined" color="inherit" className={classes.secondary}>
               {ctaSecLink?.label}
                 </Button>
             </Link>}
@@ -84,4 +83,7 @@ const useStyles = makeStyles((theme) => ({
       paddingRight: 0,
     },
   },
+  secondary:{ 
+    marginLeft:theme.spacing(2)
+  }
 }));

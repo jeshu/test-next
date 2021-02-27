@@ -12,10 +12,8 @@ export default function CustomerDetails({ id }) {
   const [personalinfo, setPersonalInfo] = useState(null);
   useEffect(() => { fetch(id) }, [])
   useEffect(() => {
-    console.log(userData);
     setPersonalInfo(userData)
   }, [userData])
-
 
   return (
     <>

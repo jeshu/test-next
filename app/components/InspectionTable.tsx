@@ -12,7 +12,7 @@ import TableRow from '@material-ui/core/TableRow';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowForward from '@material-ui/icons/ArrowForward';
 import Link from 'next/link';
-import { createStyles, lighten, makeStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles, Theme } from '@material-ui/core/styles';
 import { useInspectionStorage } from 'lib/useInspectionData';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -25,9 +25,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '100%',
     margin: theme.spacing(8, 0),
   },
-  table: {
-    minWidth: 750,
-  },
   visuallyHidden: {
     border: 0,
     clip: 'rect(0 0 0 0)',
@@ -39,7 +36,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     top: 20,
     width: 1,
   },
-
   table: {
     maxWidth: '100%',
     overflow: 'hidden'
@@ -52,10 +48,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const InspectionTable = ({ customerId, policyId, inspectionStarted, onSimulationEnd }) => {
-  const { list, fetchAll, insert } = useInspectionStorage()
+const InspectionTable = ({ customerId, policyId = '', isInspectionPage = false }) => {
+  const { list, fetchAll } = useInspectionStorage()
   const classes = useStyles();
-  const rows: any = list && list.reduce((acc:any, item:any) => {
+  const rows: any = list && list.sort((a:any, b:any)=> (b.Timestamp > a.Timestamp)? 1 : -1 )
+    .reduce((acc: any, item: any) => {
     const data = {
       inspectionId: item.inspectionId,
       timeStamp: item.Timestamp,
@@ -72,12 +69,12 @@ const InspectionTable = ({ customerId, policyId, inspectionStarted, onSimulation
 
 
   return (
-    list && list.length > 0 ?
-      <Paper className={classes.paper} elevation={0}>
-        <Container className={classes.root}>
-          <Typography variant="h4" id="tableTitle" component="h3">
-            Inspection History
+    <Paper className={isInspectionPage && classes.paper} elevation={0}>
+      <Container className={classes.root}>
+        <Typography variant="h4" id="tableTitle" component="h3">
+          Inspection History
         </Typography>
+        {list && list.length > 0 ?
           <TableContainer>
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
@@ -97,7 +94,7 @@ const InspectionTable = ({ customerId, policyId, inspectionStarted, onSimulation
                       </TableCell>)
                     )}
                     <TableCell align="right">
-                      <Link href={`/policy/${policyId}/${row.inspectionId}`}>
+                      <Link href={`/customer/${customerId}/inspection/${row.inspectionId}`}>
                         <IconButton><ArrowForward /></IconButton>
                       </Link>
                     </TableCell>
@@ -107,12 +104,12 @@ const InspectionTable = ({ customerId, policyId, inspectionStarted, onSimulation
               </TableBody>
             </Table>
           </TableContainer>
-        </Container>
-      </Paper>
-      :
-      <Box>
-        Data not available
-    </Box>
+          :
+          <Box>
+            Data not available
+          </Box>}
+      </Container>
+    </Paper>
   );
 }
 export default InspectionTable

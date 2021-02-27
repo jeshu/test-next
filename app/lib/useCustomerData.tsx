@@ -99,7 +99,7 @@ function useProvideCustomerStorage() {
     tableService.insertEntity(TABLE_NAME, task,  (error, result) => {
       if(!error){
         // Entity inserted
-        router.push('/customers');
+        router.push('/customer');
       } else {
         setError(error.message)
       }

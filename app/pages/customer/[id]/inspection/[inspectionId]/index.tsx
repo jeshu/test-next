@@ -1,14 +1,20 @@
+import { useState, useEffect } from 'react';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Alert from '@material-ui/lab/Alert';
-import Hero from 'components/Hero';
 import DoranDataTable from 'components/DoranDataTable';
+import Link from 'next/link';
+import { useInspectionStorage } from 'lib/useInspectionData';
 import { makeStyles } from '@material-ui/core/styles';
+import { calculatePreHarvest } from 'utils/IDVCalculator';
 
 const useStyles = makeStyles((theme) => ({
+  topShift: {
+    marginTop: theme.spacing(6)
+  },
   sliderBase: {
     '& .react-slider__ul': {
       display: 'none',
@@ -16,66 +22,142 @@ const useStyles = makeStyles((theme) => ({
   },
   alert: {
     display: 'flex',
-    alignItems:'center',
-    '& button':{
-      marginLeft:theme.spacing(2)
+    alignItems: 'center',
+    '& button': {
+      marginLeft: theme.spacing(2)
     }
-  }
+  },
+  textfield: {
+    marginLeft: theme.spacing(1)
+  },
 }))
 
-export default function ClaimsDetails({ id, claimId }) {
+
+export default function InspectionPage({ id, inspectionId }) {
   const classes = useStyles();
+  const preInspectionIDV = 1500000;
+  const [recommendation, setRecommendation] = useState(null);
+  const [inspectionStarted, setInspectionStarted] = useState(false);
+  const [enableCalculator, setEnableCalculator] = useState(false);
+  const { inspectionData, fetch, updateIDV } = useInspectionStorage();
+  const [avgValues, setAvgValues] = useState(null);
+  useEffect(() => {
+    fetch(inspectionId);
+  }, [])
+  const startInspection = () => {
+    setInspectionStarted(true);
+  };
 
-  return (
-    <>
-      <Hero title="Brijesh Kumar" subtext={`User Id: ${id}`} ctalink={{ label: 'Policy information', url: `/policy/${id}` }} ctaSecLink={{ label: 'Personal information', url: `/policy/${id}/personalinfo` }} />
+  const onSimulationEnd = (_avgValues) => {
+    setInspectionStarted(false);
+    setEnableCalculator(true)
+    setAvgValues(_avgValues)
+    const idv = calculatePreHarvest(_avgValues, preInspectionIDV)
+    // updateIDV(inspectionId, idv)
+  }
+  const calculateIDV = () => {
+    
+  }
 
-      <Box>
-        <Container>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography
-                component="h2"
-                variant="h4"
-                color="inherit"
-                gutterBottom
-              >
-                Inspection Id: {claimId}
-              </Typography>
-              <Button variant="outlined" color="secondary">
-                Start Inspection
-             </Button>
-            </Grid>
-            <Grid item xs={12} className={classes.sliderBase}>
-              <Box >
-                <Alert severity="info" className={classes.alert}>This is the recommendation for the farmer.
-                <Button variant="outlined" color="secondary">
-                    Notify
-                </Button>
-                </Alert>
-              </Box>
-            </Grid>
-            <Grid item xs={12} className={classes.sliderBase}>
-              <Typography
-                component="h5"
-                variant="h5"
-                color="inherit"
-                gutterBottom
-              >
-                Feeds from Doran
-            </Typography>
-              <DoranDataTable />
-            </Grid>
-            <Grid item xs={12} md={6}> 
-              Recomadations...
-            </Grid>
-          </Grid>
-        </Container>
+  useEffect(() => {
+    console.log('inspectionData', inspectionData)
+  })
+
+
+  const renderRecomandatios = () => {
+    return (recommendation ? <Grid item xs={12} className={classes.sliderBase}>
+      <Box >
+        <Alert severity="info" className={classes.alert}>This is the recommendation for the farmer.
+      <Button variant="outlined" color="secondary">
+            Notify
+      </Button>
+        </Alert>
       </Box>
-    </>
+    </Grid> : null)
+  }
+  return (
+    <Box>
+      <Container className={classes.topShift}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Typography
+              component="h2"
+              variant="h4"
+              color="inherit"
+              gutterBottom
+            >
+              Inspection with Droan
+              
+            <Typography
+              component="span"
+              variant="h6"
+              color="inherit"
+              gutterBottom
+            >
+              {inspectionId && ` (${inspectionId})`}
+            </Typography>
+            </Typography>
+            {enableCalculator && preInspectionIDV && 
+            <>
+              <Typography
+                component="h6"
+                variant="h6"
+                color="inherit"
+                gutterBottom
+              >
+                Base line IDV : {preInspectionIDV.toLocaleString()} Rs.
+              </Typography> 
+              <Typography
+                component="h6"
+                variant="h6"
+                color="inherit"
+                gutterBottom
+              >
+                IDV after Inspection : 120000 Rs.
+              </Typography> 
+              <Typography
+                component="h6"
+                variant="h6"
+                color="inherit"
+                gutterBottom
+              >
+                Single Premium : 3000 Rs. per month
+              </Typography>
+              </>
+            }
+            {!inspectionStarted && !enableCalculator &&
+              <Button variant="outlined" color="secondary" onClick={startInspection}>
+                Start Inspection
+            </Button>}
+            {enableCalculator && 
+            <>
+            <Button variant="outlined" color="secondary" onClick={calculateIDV}>
+              Create policy
+            </Button>
+            <Link href={`/customer/${id}`}>
+              <Button variant="outlined" color="secondary">
+                Save
+              </Button>
+            </Link>
+            </>
+            }
+          </Grid>
+          {renderRecomandatios()}
+          {(inspectionStarted || enableCalculator) && <Grid item xs={12} className={classes.sliderBase}>
+            
+            <DoranDataTable
+              customerId={id}
+              inspectionId={inspectionId}
+              inspectionStarted={inspectionStarted}
+              onSimulationEnd={onSimulationEnd}
+            />
+          </Grid>}
+        </Grid>
+      </Container>
+    </Box>
   );
 }
 
-ClaimsDetails.getInitialProps = ({ query: { id, claimId } }) => {
-  return { id, claimId };
+InspectionPage.getInitialProps = ({ query: { id, inspectionId } }) => {
+  return { id, inspectionId };
 };

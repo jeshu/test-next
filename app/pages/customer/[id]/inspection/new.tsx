@@ -57,7 +57,7 @@ export default function NewInspection({ id }) {
     setEnableCalculator(true)
     setAvgValues(_avgValues)
     const idv = calculatePreHarvest(_avgValues, preInspectionIDV)
-    // updateIDV(inspectionId, idv)
+    updateIDV(inspectionId, idv)
   }
   const calculateIDV = () => {
     
@@ -97,7 +97,7 @@ export default function NewInspection({ id }) {
               {inspectionId && ` (${inspectionId})`}
             </Typography>
             </Typography>
-            {preInspectionIDV && 
+            {enableCalculator && preInspectionIDV && 
             <>
               <Typography
                 component="h6"
@@ -144,14 +144,7 @@ export default function NewInspection({ id }) {
           </Grid>
           {renderRecomandatios()}
           {(inspectionStarted || enableCalculator) && <Grid item xs={12} className={classes.sliderBase}>
-            <Typography
-              component="h5"
-              variant="h5"
-              color="inherit"
-              gutterBottom
-            >
-              Feeds from Doran
-            </Typography>
+            
             <DoranDataTable
               customerId={id}
               inspectionId={inspectionId}

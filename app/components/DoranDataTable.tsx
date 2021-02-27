@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TableContainer from '@material-ui/core/TableContainer';
 import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -30,7 +31,8 @@ const useStyles = makeStyles({
 const DoranDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulationEnd }) => {
   const { data, fetch, insert } = useDroanStorage()
   const classes = useStyles();
-  const rows: any = data && data.reduce((acc: any = [], row: any) => {
+  const rows: any = data && data.sort((a:any, b:any)=> (b.Timestamp > a.Timestamp)? 1 : -1 )
+    .reduce((acc: any = [], row: any) => {
     delete row.isDone;
     acc.push(row)
     return acc
@@ -89,44 +91,55 @@ const DoranDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
 
   return (
     data && data.length > 0 ?
-      <TableContainer>
-        <Table className={classes.table} aria-label="simple table" stickyHeader={true}>
-          <TableHead>
-            <TableRow>
-              {rows && rows[0] && Object.keys(rows[0]).map((_key, index) => (
-                <TableCell align={index === 0 ? 'left' : 'center'}>{_key.toUpperCase()}</TableCell>
-              ))}
-              <TableCell align='center'>Image</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody className={classes.tableBody}>
-            {rows.map((row) => (
-              <TableRow key={row.name}>
-                {Object.values(row).map((_value, index) => (
-                  <TableCell component="th" scope="row" align={index === 0 ? 'left' : 'center'}>
-                    {_value}
-                  </TableCell>)
-                )}
-                <TableCell align='center'>
-                  <a href='https://images.unsplash.com/photo-1437252611977-07f74518abd7?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8d2hlYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&w=1000&q=80' target="_blank">
-                    <img className={classes.image} src="https://images.unsplash.com/photo-1437252611977-07f74518abd7?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8d2hlYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&w=1000&q=80" />
-                  </a>
-                </TableCell>
+      <Box>
+        <Typography
+          component="h5"
+          variant="h5"
+          color="inherit"
+          gutterBottom
+        >
+          Feeds from Doran
+        </Typography>
+        <TableContainer>
+          <Table className={classes.table} aria-label="simple table" stickyHeader={true}>
+            <TableHead>
+              <TableRow>
+                {rows && rows[0] && Object.keys(rows[0]).map((_key, index) => (
+                  <TableCell align={index === 0 ? 'left' : 'center'}>{_key.toUpperCase()}</TableCell>
+                ))}
+                <TableCell align='center'>Image</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              {avgValues && Object.values(avgValues).map((_value, index) => (
-                <TableCell align={index === 0 ? 'left' : 'center'}>{_value}</TableCell>
+            </TableHead>
+            <TableBody className={classes.tableBody}>
+              {rows.map((row) => (
+                <TableRow key={row.name}>
+                  {Object.values(row).map((_value, index) => (
+                    <TableCell component="th" scope="row" align={index === 0 ? 'left' : 'center'}>
+                      {_value}
+                    </TableCell>)
+                  )}
+                  <TableCell align='center'>
+                    <a href='https://images.unsplash.com/photo-1437252611977-07f74518abd7?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8d2hlYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&w=1000&q=80' target="_blank">
+                      <img className={classes.image} src="https://images.unsplash.com/photo-1437252611977-07f74518abd7?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8d2hlYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&w=1000&q=80" />
+                    </a>
+                  </TableCell>
+                </TableRow>
               ))}
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </TableContainer> :
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                {avgValues && Object.values(avgValues).map((_value, index) => (
+                  <TableCell align={index === 0 ? 'left' : 'center'}>{_value}</TableCell>
+                ))}
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </TableContainer>
+      </Box>
+      :
       <Box>
         Preparing the Droan...
-    </Box>
+      </Box>
   );
 }
 export default DoranDataTable
