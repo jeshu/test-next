@@ -8,10 +8,10 @@ type PolicyStorageProps = {
   policyList: []
   policyData: any
   error: string
-  fetch(policyId: string): null
-  fetchAll(customerId: string): null
-  insert(policyData: any, callback: Function): null
-  update(policyId: string, policyData: any): null
+  fetch(policyId: string): void
+  fetchAll(customerId: string): void
+  insert(policyData: any, callback: Function): void
+  update(policyId: string, policyData: any): void
 }
 
 const PolicyStorageContext = createContext<Partial<PolicyStorageProps>>({})
@@ -20,8 +20,8 @@ export function PolicyStorageProvider({ children }) {
   const _mPolicyData = useProvidePolicyStorage()
   return <PolicyStorageContext.Provider value={_mPolicyData}>{children}</PolicyStorageContext.Provider>
 }
-export const useInspectionStorage = () => {
-  return useContext(InspectionStorageContext);
+export const usePolicyStorage = () => {
+  return useContext(PolicyStorageContext);
 };
 
 function dataParser(data: any) {
@@ -88,7 +88,6 @@ const useProvidePolicyStorage = (): PolicyStorageProps => {
       RowKey: entGen.String(uid(16)),
       policyId: entGen.String(policyId),
       ...policyData,
-      policyAssociated: entGen.String(''),
     };
     tableService.insertEntity(TABLE_NAME, task, (error, result) => {
       if (!error) {
@@ -100,7 +99,31 @@ const useProvidePolicyStorage = (): PolicyStorageProps => {
       }
     });
   }
-  const update = (policyId:string, policyData:any) => {}
+  const update = (policyId:string, policyData:any) => {
+    setError('')
+    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    const entGen = azure.TableUtilities.entityGenerator;
+    const tableQuery = new azure.TableQuery()
+      .where('policyId == ?string?', policyId)
+
+    tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
+      if (!error) {
+        const task = result.entries[0]
+        for(const key in policyData) {
+          task[key] = entGen.String(`${policyData[key]}`);
+        }
+        tableService.replaceEntity(TABLE_NAME, task, (error, result) => {
+          if (!error) {
+            console.log('value updated')
+          } else {
+            setError(error.message)
+          }
+        });
+      } else {
+        setError(error.message)
+      }
+    });
+  }
 
 
   return {

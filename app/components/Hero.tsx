@@ -9,7 +9,7 @@ import { makeStyles} from '@material-ui/core/styles';
 import { useAuth } from 'lib/useAuth';
 
 export default function Hero({
-  title, subtext, ctalink, ctaSecLink
+  title, subtext, ctalink, ctaSecLink = null
 }) {
   const classes = useStyles()
   const { user = { emial: 'none', policyId: 'someid' } } = useAuth();

@@ -45,8 +45,8 @@ export default function Customer() {
 
   useEffect(() => {
     if (data) {
-      setNewCustomer(data.filter((c: any) => c.inspectionPending === 'true'))
-      setPolicyHolders(data.filter((c: any) => c.inspectionPending === 'false'))
+      setNewCustomer(data.filter((c: any) => !c.policyAssociated))
+      setPolicyHolders(data.filter((c: any) => !!c.policyAssociated))
       console.log(data);
     }
   }, [data])
@@ -115,7 +115,7 @@ export default function Customer() {
                   </Typography>
                 }
               />
-              <Link href={`policy/${item.id}`}>
+              <Link href={`customer/${item.userId}`}>
                 <ListItemSecondaryAction>
                   <IconButton edge="end" aria-label="comments">
                     <ArrowForward />

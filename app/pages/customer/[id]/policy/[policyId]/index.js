@@ -1,3 +1,4 @@
+import {useState, useEffect} from 'react';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -5,94 +6,82 @@ import Box from '@material-ui/core/Box';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Hero from 'components/Hero';
-import ClaimsHistory from 'components/ClaimsHistory';
+import InspectionTable from 'components/InspectionTable';
+import {useCustomerStorage} from 'lib/useCustomerData';
+import {usePolicyStorage} from 'lib/usePolicyData';
+import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 
 
-const policyData = [{
+const __policyData = [{
+  key:'farmArea',
   label: 'Farm area',
   unit: 'acres',
-  value: '5',
 }, {
+  key:'expectedYeild',
   label: 'Expected yield',
   unit: 'Qntl/acre',
-  value: '20',
 }, {
+  key:'expectedMarketPrice',
   label: 'Expected market price',
   unit: 'Rs/Kg',
-  value: '15',
 }, {
   label: 'Premium rate',
   unit: '%',
-  value: '2',
+  value: '2'
 }, {
-  label: 'Sum Insured',
+  key:'IDV',
+  label: 'IDV',
   unit: 'Rs',
-  value: '10500',
 }, {
+  key:'premium',
   label: 'Premium',
   unit: 'Rs',
-  value: '2100',
 }, {
+  key:'coveragePeriod',
   label: 'Coverage Period',
   unit: 'months',
-  value: '6',
 }, {
+  key:'Timestamp',
   label: 'Policy commencement date',
-  value: '1st Jan 2020',
+},{
+  key:'claimAmount',
+  label: 'Claim Amount',
 },]
 
-const policyClaimsList = [
-  {
-    "_id": "60351a68ad74c204749455b5",
-    "sumAssured": "1,232.35",
-    "inspectionDate": "Wednesday, August 6, 2014 12:07 PM",
-    "inspectionId": 37839,
-    "currency": "Rs"
-  },
-  {
-    "_id": "60351a687d7337b6d7a94ad1",
-    "sumAssured": "3,335.36",
-    "inspectionDate": "Wednesday, January 29, 2020 2:51 PM",
-    "inspectionId": 37840,
-    "currency": "Rs"
-  },
-  {
-    "_id": "60351a68754f0d4391adb0a9",
-    "sumAssured": "1,589.37",
-    "inspectionDate": "Saturday, February 1, 2014 6:05 AM",
-    "inspectionId": 37841,
-    "currency": "Rs"
-  },
-  {
-    "_id": "60351a68bf0eb8e0324c8203",
-    "sumAssured": "3,247.74",
-    "inspectionDate": "Tuesday, August 7, 2018 6:25 PM",
-    "inspectionId": 37842,
-    "currency": "Rs"
-  },
-  {
-    "_id": "60351a688182ba844ce1fe8f",
-    "sumAssured": "3,109.47",
-    "inspectionDate": "Thursday, January 21, 2021 6:02 PM",
-    "inspectionId": 37843,
-    "currency": "Rs"
-  },
-  {
-    "_id": "60351a68a76cd768833c0c00",
-    "sumAssured": "2,821.20",
-    "inspectionDate": "Wednesday, February 4, 2015 8:04 PM",
-    "inspectionId": 37844,
-    "currency": "Rs"
-  }
-]
 
 
-export default function PolicyDetails({ id }) {
+export default function PolicyDetails({ id, policyId }) {
+  const { userData, fetch } = useCustomerStorage();
+  const { policyData, fetch:fetchPolicy } = usePolicyStorage();
+  const [personalinfo, setPersonalInfo] = useState(null);
+  const [policyInfo, setPolicyInfo] = useState(null);
+  useEffect(() => { 
+    fetchPolicy(policyId)
+    fetch(id) 
+  }, [policyId])
+  useEffect(() => {
+    setPersonalInfo(userData)
+  }, [userData])
+  useEffect(() => {
+    console.log(policyData);
+    if(policyData) {
+      const data = __policyData.map(item=>{
+        if(item.key) 
+          item.value = policyData[item.key]
+        return item;
+      });
+      setPolicyInfo(data)
+    }
+  }, [policyData])
 
-  const styles = useStyles();
+
+  const classes = useStyles();
   return (
     <>
-      <Hero title="Brijesh Kumar" subtext={`Policy no: AX-${id}`} ctalink={{ label: 'Policy information', url: `/policy/${id}` }} ctaSecLink={{ label: 'Personal information', url: `/policy/${id}/personalinfo` }} />
+      <Hero title={personalinfo?.name} 
+        subtext={policyId && `Policy no: ${policyId}`} 
+        ctalink={{ label: 'Personal information', url: `/customer/${id}` }} 
+     />
       <Box>
         <Container>
           <Grid container spacing={3}>
@@ -106,7 +95,7 @@ export default function PolicyDetails({ id }) {
                 Policy Details
             </Typography>
             </Grid>
-            {policyData && policyData.map(item => (
+            {policyInfo && policyInfo.map(item => (
               <Grid item md={4} xs={6}>
                 <Typography
                   component="p"
@@ -126,11 +115,25 @@ export default function PolicyDetails({ id }) {
                 </Typography>
               </Grid>
             ))}
+            
           </Grid>
+            <Box className={classes.download}>
+              <PictureAsPdfIcon 
+                  color="secondary"/>
+                <Typography
+                  className={classes.downloadTxt}
+                  component="span"
+                  variant="inherit"
+                  color="secondary"
+                >
+                  Download Policy as PDF
+                </Typography> 
+            </Box>
         </Container>
       </Box>
+      
       <Box>
-        <ClaimsHistory policyId={id} />
+        <InspectionTable customerId={id} />
       </Box>
     </>
   );
@@ -139,9 +142,18 @@ export default function PolicyDetails({ id }) {
 const useStyles = makeStyles((theme) => ({
   gridBg: {
     backgroundColor: 'rgba(30, 136, 229, 0.1)'
+  },
+  download: {
+    cursor:'pointer',
+    margin: theme.spacing(2, 0),
+    display: 'flex',
+    alignItems: 'center'
+  },
+  downloadTxt: {
+    marginLeft: theme.spacing(1),
   }
 }))
 
-PolicyDetails.getInitialProps = ({ query: { id } }) => {
-  return { id };
+PolicyDetails.getInitialProps = ({ query: { id, policyId } }) => {
+  return { id, policyId };
 };

@@ -7,7 +7,10 @@ import Button from '@material-ui/core/Button';
 import Alert from '@material-ui/lab/Alert';
 import DoranDataTable from 'components/DoranDataTable';
 import Link from 'next/link';
+import {useRouter} from 'next/router';
 import { useInspectionStorage } from 'lib/useInspectionData';
+import { useCustomerStorage } from 'lib/useCustomerData';
+import { usePolicyStorage } from 'lib/usePolicyData';
 import { makeStyles } from '@material-ui/core/styles';
 import { calculatePreHarvest } from 'utils/IDVCalculator';
 
@@ -34,18 +37,26 @@ const useStyles = makeStyles((theme) => ({
 
 
 export default function NewInspection({ id }) {
+  const router = useRouter()
   const classes = useStyles();
   const preInspectionIDV = 1500000;
   const [recommendation, setRecommendation] = useState(null);
   const [inspectionId, setInspectionId] = useState('');
   const [inspectionStarted, setInspectionStarted] = useState(false);
   const [enableCalculator, setEnableCalculator] = useState(false);
-  const { insert, updateIDV } = useInspectionStorage();
-  const [avgValues, setAvgValues] = useState(null);
+  const { insert:addPolicy, update:updatePolicy } = usePolicyStorage();
+  const { insert, update:updateInspectionData } = useInspectionStorage();
+  const { userData: customerData, update:updateCustomerData, fetch:fetchCustomerData } = useCustomerStorage();
+  const [idv, setIDV] = useState(null);
+
+  useEffect(() => {
+    fetchCustomerData(id);
+  }, [])
+
   const startInspection = () => {
     insert({
       IDV: 0,
-      customerId: id
+      customerId: id,
     }, (inspectionId) => {
       setInspectionId(inspectionId)
       setInspectionStarted(true);
@@ -55,12 +66,21 @@ export default function NewInspection({ id }) {
   const onSimulationEnd = (_avgValues) => {
     setInspectionStarted(false);
     setEnableCalculator(true)
-    setAvgValues(_avgValues)
     const idv = calculatePreHarvest(_avgValues, preInspectionIDV)
-    updateIDV(inspectionId, idv)
+    updateInspectionData(inspectionId, idv)
+    setIDV(idv)
   }
   const calculateIDV = () => {
-    
+    const {farmArea, expectedYeild, expectedMarketPrice, coveragePeriod} = customerData;
+    console.log(customerData)
+    addPolicy({
+      customerId: id,
+      farmArea, expectedYeild, expectedMarketPrice, coveragePeriod, ...idv
+    }, (policyId) =>{
+      updateCustomerData(id, {policyAssociated:policyId})
+      updateInspectionData(inspectionId, {policyAssociated:policyId})
+      router.push(`/customer/`)
+    })
   }
 
 

@@ -51,13 +51,17 @@ const useStyles = makeStyles((theme: Theme) => ({
 const InspectionTable = ({ customerId, policyId = '', isInspectionPage = false }) => {
   const { list, fetchAll } = useInspectionStorage()
   const classes = useStyles();
+
+  const policyLink = (policyAssociated) => {
+    return <Link href={`/customer/${customerId}/policy/${policyAssociated}`}>{policyAssociated}</Link>
+  }
   const rows: any = list && list.sort((a:any, b:any)=> (b.Timestamp > a.Timestamp)? 1 : -1 )
     .reduce((acc: any, item: any) => {
     const data = {
       inspectionId: item.inspectionId,
       timeStamp: item.Timestamp,
       IDV: item.IDV,
-      policy: item.policyAssociated
+      policy: policyLink(item.policyAssociated)
     }
     acc.push(data)
     return acc;

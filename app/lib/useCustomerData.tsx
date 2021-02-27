@@ -8,10 +8,10 @@ type CustomerStorageProps = {
   data: []
   userData: any
   error: string
-  fetch(userId: string): null
-  fetchAll(): null
-  insert(userData: any): null
-  update(data: any): null
+  fetch(userId: string): void
+  fetchAll(): void
+  insert(userData: any): void
+  update(userId:string, data: any): void
 }
 
 const CustomerStorageContext = createContext<Partial<CustomerStorageProps>>({});
@@ -40,7 +40,7 @@ function dataParser(data: any) {
   return parsedData;
 };
 
-function useProvideCustomerStorage() {
+function useProvideCustomerStorage(): CustomerStorageProps {
   const router = useRouter();
   const [customerData, setCustomerData] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -105,8 +105,30 @@ function useProvideCustomerStorage() {
       }
     });
   }
-  const update = (data:any) => {
+  const update = (userId:string, data:any) => {
+    setError('')
+    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    const entGen = azure.TableUtilities.entityGenerator;
+    const tableQuery = new azure.TableQuery()
+      .where('userId == ?string?', userId)
 
+    tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
+      if (!error) {
+        const task = result.entries[0]
+        for(const key in data) {
+          task[key] = entGen.String(`${data[key]}`);
+        }
+        tableService.replaceEntity(TABLE_NAME, task, (error, result) => {
+          if (!error) {
+            console.log('value updated')
+          } else {
+            setError(error.message)
+          }
+        });
+      } else {
+        setError(error.message)
+      }
+    });
   }
 
   return {

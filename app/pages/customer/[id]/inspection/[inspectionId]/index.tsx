@@ -5,11 +5,13 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Alert from '@material-ui/lab/Alert';
+import { makeStyles } from '@material-ui/core/styles';
 import DoranDataTable from 'components/DoranDataTable';
 import Link from 'next/link';
+import {useRouter} from 'next/router';
 import { useInspectionStorage } from 'lib/useInspectionData';
-import { makeStyles } from '@material-ui/core/styles';
-import { calculatePreHarvest } from 'utils/IDVCalculator';
+import { usePolicyStorage } from 'lib/usePolicyData';
+import { calculatePostHarvest } from 'utils/IDVCalculator';
 
 const useStyles = makeStyles((theme) => ({
   topShift: {
@@ -33,35 +35,53 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 
-export default function InspectionPage({ id, inspectionId }) {
+export default function NewInspection({ id, inspectionId }) {
+  const router = useRouter()
   const classes = useStyles();
   const preInspectionIDV = 1500000;
   const [recommendation, setRecommendation] = useState(null);
+  const [newInspectionId, setNewInspectionId] = useState(null);
   const [inspectionStarted, setInspectionStarted] = useState(false);
   const [enableCalculator, setEnableCalculator] = useState(false);
-  const { inspectionData, fetch, updateIDV } = useInspectionStorage();
-  const [avgValues, setAvgValues] = useState(null);
+  const { policyData, fetch:Fw, update:updatePolicy } = usePolicyStorage();
+  const { inspectionData, fetch:fetchInspectionData, insert:insertInspection, update:updateInspectionData } = useInspectionStorage();
+  const [idv, setIDV] = useState(null);
+
   useEffect(() => {
-    fetch(inspectionId);
+    fetchInspectionData(inspectionId);
   }, [])
+
   const startInspection = () => {
-    setInspectionStarted(true);
+    console.log(inspectionData.policyAssociated);
+    
+    insertInspection({
+      IDV: 0,
+      customerId: id,
+      policyAssociated: inspectionData.policyAssociated
+    }, (_mInspectionId) => {
+      setNewInspectionId(_mInspectionId)
+      setInspectionStarted(true);
+    });
   };
 
   const onSimulationEnd = (_avgValues) => {
     setInspectionStarted(false);
-    setEnableCalculator(true)
-    setAvgValues(_avgValues)
-    const idv = calculatePreHarvest(_avgValues, preInspectionIDV)
-    // updateIDV(inspectionId, idv)
-  }
-  const calculateIDV = () => {
-    
+    setEnableCalculator(true);
+    setIDV(calculatePostHarvest(_avgValues, inspectionData.IDV))
   }
 
   useEffect(() => {
-    console.log('inspectionData', inspectionData)
-  })
+    if(idv) {
+      updateInspectionData(newInspectionId, idv)
+    }
+  },[idv])
+
+  const convertToClaims = () => {
+    updatePolicy(inspectionData.policyAssociated, {
+      claimAmount : idv.IDV 
+    })
+    router.push(`/customer/${id}`)
+  }
 
 
   const renderRecomandatios = () => {
@@ -94,10 +114,10 @@ export default function InspectionPage({ id, inspectionId }) {
               color="inherit"
               gutterBottom
             >
-              {inspectionId && ` (${inspectionId})`}
+              {(newInspectionId && ` (${newInspectionId})`) || (inspectionId && ` (${inspectionId})`)}
             </Typography>
             </Typography>
-            {enableCalculator && preInspectionIDV && 
+             
             <>
               <Typography
                 component="h6"
@@ -113,7 +133,7 @@ export default function InspectionPage({ id, inspectionId }) {
                 color="inherit"
                 gutterBottom
               >
-                IDV after Inspection : 120000 Rs.
+                IDV after Inspection : {120000} Rs.
               </Typography> 
               <Typography
                 component="h6"
@@ -124,15 +144,15 @@ export default function InspectionPage({ id, inspectionId }) {
                 Single Premium : 3000 Rs. per month
               </Typography>
               </>
-            }
+            
             {!inspectionStarted && !enableCalculator &&
               <Button variant="outlined" color="secondary" onClick={startInspection}>
-                Start Inspection
+                Start New Inspection
             </Button>}
             {enableCalculator && 
             <>
-            <Button variant="outlined" color="secondary" onClick={calculateIDV}>
-              Create policy
+            <Button variant="outlined" color="secondary" onClick={convertToClaims}>
+              Convet to Claim
             </Button>
             <Link href={`/customer/${id}`}>
               <Button variant="outlined" color="secondary">
@@ -143,21 +163,20 @@ export default function InspectionPage({ id, inspectionId }) {
             }
           </Grid>
           {renderRecomandatios()}
-          {(inspectionStarted || enableCalculator) && <Grid item xs={12} className={classes.sliderBase}>
-            
+          <Grid item xs={12} className={classes.sliderBase}>
             <DoranDataTable
               customerId={id}
-              inspectionId={inspectionId}
+              inspectionId={newInspectionId || inspectionId}
               inspectionStarted={inspectionStarted}
               onSimulationEnd={onSimulationEnd}
             />
-          </Grid>}
+          </Grid>
         </Grid>
       </Container>
     </Box>
   );
 }
 
-InspectionPage.getInitialProps = ({ query: { id, inspectionId } }) => {
+NewInspection.getInitialProps = ({ query: { id, inspectionId } }) => {
   return { id, inspectionId };
 };

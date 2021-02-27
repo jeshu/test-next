@@ -11,8 +11,9 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TableRow from '@material-ui/core/TableRow';
 import { useDroanStorage } from 'lib/useDroanStorage';
 import { averageFieldData } from 'utils/IDVCalculator';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   table: {
     maxWidth: '100%',
     overflow: 'hidden'
@@ -25,26 +26,31 @@ const useStyles = makeStyles({
   },
   tableBody: {
     maxHeight: '60vh'
+  },
+  title: {
+    display: 'flex',
+    alignItems: 'center',
+    margin: theme.spacing(3, 0),
+  },
+  spinner: {
+    marginLeft: theme.spacing(2)
   }
-});
+}));
 
 const DoranDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulationEnd }) => {
   const { data, fetch, insert } = useDroanStorage()
   const classes = useStyles();
-  const rows: any = data && data.sort((a:any, b:any)=> (b.Timestamp > a.Timestamp)? 1 : -1 )
-    .reduce((acc: any = [], row: any) => {
-    delete row.isDone;
-    acc.push(row)
-    return acc
-  }, []) || [];
   const [avgValues, setAvgValues] = useState(null)
+  const rows: any = data && data.sort((a: any, b: any) => (b.Timestamp > a.Timestamp) ? 1 : -1)
+    .reduce((acc: any = [], row: any) => {
+      delete row.isDone;
+      acc.push(row)
+      return acc
+    }, []) || [];
   useEffect(() => {
     const avg = averageFieldData(rows)
     setAvgValues(avg)
   }, [data])
-  useEffect(() => {
-    fetch(customerId, inspectionId)
-  }, [customerId, inspectionId]);
 
   const [fetchCounter, setFetchCounter] = useState(0)
   useEffect(() => {
@@ -52,38 +58,42 @@ const DoranDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
       if (inspectionStarted === true) {
         fetch(customerId, inspectionId)
         setFetchCounter(fetchCounter + 1)
+      } else {
+        setFetchCounter(0)
       }
     }, 10000)
+    if (fetchCounter === 0) {
+      fetch(customerId, inspectionId)
+    }
   }, [inspectionStarted, fetchCounter])
   const [counter, setCounter] = useState(0);
   useEffect(() => {
-    if (!inspectionStarted && counter === 0 && (!data || data.length === 0)) {
-      return
-    }
-    const lastData = data && data.find((item: any) => item.isDone === 'true')
-    if (lastData || counter > 20) {
-      onSimulationEnd(avgValues)
-    } else {
-      setTimeout(() => {
-        insert({
-          Cultivatedland: Math.round(10 + (Math.random() * 10)),
-          UnFertileLand: Math.round(10 + (Math.random() * 10)),
-          OtherAreas: Math.round(10 + (Math.random() * 10)),
-          HighQualityCrop: Math.round(10 + (Math.random() * 10)),
-          LowQualityCrop: Math.round(10 + (Math.random() * 10)),
-          DamageArea: Math.round(10 + (Math.random() * 10)),
-          Temperature: Math.round(10 + (Math.random() * 10)),
-          Humidity: Math.round(10 + (Math.random() * 10)),
-          WindSpeed: Math.round(10 + (Math.random() * 10)),
-          Moisture: Math.round(10 + (Math.random() * 10)),
-          DroneHeight: Math.round(10 + (Math.random() * 10)),
-          DroneCameraResolution: Math.round(10 + (Math.random() * 10)),
-          customerId,
-          inspectionId,
-          isDone: counter > 20 ? 'true' : 'false'
-        })
-        setCounter(counter + 1);
-      }, 1000)
+    if (inspectionStarted === true) {
+      const lastData = data && data.find((item: any) => item.isDone === 'true')
+      if (lastData || counter > 20) {
+        onSimulationEnd(avgValues)
+      } else {
+        setTimeout(() => {
+          insert({
+            Cultivatedland: Math.round(10 + (Math.random() * 10)),
+            UnFertileLand: Math.round(10 + (Math.random() * 10)),
+            OtherAreas: Math.round(10 + (Math.random() * 10)),
+            HighQualityCrop: Math.round(10 + (Math.random() * 10)),
+            LowQualityCrop: Math.round(10 + (Math.random() * 10)),
+            DamageArea: Math.round(10 + (Math.random() * 10)),
+            Temperature: Math.round(10 + (Math.random() * 10)),
+            Humidity: Math.round(10 + (Math.random() * 10)),
+            WindSpeed: Math.round(10 + (Math.random() * 10)),
+            Moisture: Math.round(10 + (Math.random() * 10)),
+            DroneHeight: Math.round(10 + (Math.random() * 10)),
+            DroneCameraResolution: Math.round(10 + (Math.random() * 10)),
+            customerId,
+            inspectionId,
+            isDone: counter > 20 ? 'true' : 'false'
+          })
+          setCounter(counter + 1);
+        }, 1000)
+      }
     }
 
   }, [counter, data, inspectionStarted])
@@ -92,14 +102,17 @@ const DoranDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
   return (
     data && data.length > 0 ?
       <Box>
-        <Typography
-          component="h5"
-          variant="h5"
-          color="inherit"
-          gutterBottom
-        >
-          Feeds from Doran
+        <Box className={classes.title}>
+          <Typography
+            component="h5"
+            variant="h5"
+            color="inherit"
+            gutterBottom
+          >
+            Feeds from Doran
         </Typography>
+          {inspectionStarted && <CircularProgress className={classes.spinner} />}
+        </Box>
         <TableContainer>
           <Table className={classes.table} aria-label="simple table" stickyHeader={true}>
             <TableHead>

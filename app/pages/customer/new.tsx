@@ -27,7 +27,9 @@ export default function NewCustomer() {
   const onSubmit = async (event) => {
     event.preventDefault();
     insert({
-      name, email, age, gender, mobile, location, address, experience,cropType
+      name, email, age, gender, mobile, location,
+      address, experience, cropType, farmArea, expectedYeild,
+      expectedMarketPrice, coveragePeriod
     });
   };
 

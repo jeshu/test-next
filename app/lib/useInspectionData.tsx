@@ -8,10 +8,10 @@ type InspectionStorageProps = {
   list: []
   inspectionData: any
   error: string
-  fetch(inspectionId: string): null
-  fetchAll(customerId: string, policyId?: string): null
-  insert(inspectionData: any, callback: Function): null
-  updateIDV(inspectionId: string, idv:any): null
+  fetch(inspectionId: string): void
+  fetchAll(customerId: string, policyId?: string): void
+  insert(inspectionData: any, callback: Function): void
+  update(inspectionId: string, data:any): void
 }
 
 const InspectionStorageContext = createContext<Partial<InspectionStorageProps>>({});
@@ -40,7 +40,7 @@ function dataParser(data: any) {
   return parsedData;
 };
 
-function useProvideInspectionStorage() {
+function useProvideInspectionStorage():InspectionStorageProps {
   const router = useRouter();
   const [list, setList] = useState(null);
   const [inspectionData, setInspectionData] = useState(null);
@@ -93,8 +93,8 @@ function useProvideInspectionStorage() {
       PartitionKey: entGen.String('users'),
       RowKey: entGen.String(uid(16)),
       inspectionId: entGen.String(inspectionId),
-      ...inspectionData,
       policyAssociated: entGen.String(''),
+      ...inspectionData,
     };
     tableService.insertEntity(TABLE_NAME, task, (error, result) => {
       if (!error) {
@@ -106,8 +106,11 @@ function useProvideInspectionStorage() {
       }
     });
   }
-  const updateIDV = (inspectionId: string, idv: any) => {
+  const update = (inspectionId: string, data: any) => {
     setError('')
+    if(!inspectionId) {
+      return
+    }
     const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
     const entGen = azure.TableUtilities.entityGenerator;
     const tableQuery = new azure.TableQuery()
@@ -116,8 +119,9 @@ function useProvideInspectionStorage() {
     tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
       if (!error) {
         const task = result.entries[0]
-        task['IDV'] = entGen.String(`${idv.idv}`);
-        task['premium'] = entGen.String(`${idv.premium}`);
+        for(const key in data) {
+          task[key] = entGen.String(`${data[key]}`);
+        }
         tableService.replaceEntity(TABLE_NAME, task, (error, result) => {
           if (!error) {
             console.log('value updated')
@@ -139,7 +143,7 @@ function useProvideInspectionStorage() {
     fetch,
     fetchAll,
     insert,
-    updateIDV,
+    update,
 
   }
 }
