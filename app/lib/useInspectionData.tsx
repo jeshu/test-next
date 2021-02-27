@@ -3,15 +3,15 @@ import azure from 'azure-storage';
 import {uid} from 'uid';
 import { useRouter } from 'next/router';
 
-const TABLE_NAME = 'Inspection';
+const TABLE_NAME = 'Inspections';
 type InspectionStorageProps = {
   list: []
   inspectionData: any
   error: string
   fetch(inspectionId: string): null
   fetchAll(customerId: string, policyId?: string): null
-  insert(inspectionData: any): null
-  update(inspectionData: any): null
+  insert(inspectionData: any, callback:Function): null
+  updateIDV(inspectionData: any): null
 }
 
 const InspectionStorageContext = createContext<Partial<InspectionStorageProps>>({});
@@ -47,17 +47,16 @@ function useProvideInspectionStorage() {
   const [error, setError] = useState('');
 
   
-  const fetch = (userId:string) => {
+  const fetch = (customerId:string) => {
     setError('')
     setInspectionData(null)
     const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    const tableQuery = new azure.TableQuery().where('userId == ?string?', userId)
+    const tableQuery = new azure.TableQuery().where('customerId == ?string?', customerId)
 
     tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
       if (!error) {
         const parsedData = result.entries.map(dataParser);
         setInspectionData(parsedData[0])
-
       } else {
         setError(error.message)
       }
@@ -76,40 +75,54 @@ function useProvideInspectionStorage() {
       if (!error) {
         const parsedData = result.entries.map(dataParser);
         setList(parsedData)
-
       } else {
         setError(error.message)
       }
     });
   }
 
-  const insert = (inspectionData:any) => {
+  const insert = (inspectionData:any, callback?:Function) => {
     setError('')
     const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
     const entGen = azure.TableUtilities.entityGenerator;
     for (const key in inspectionData) {
       inspectionData[key] = entGen.String(inspectionData[key])
     }
+    const inspectionId = uid()
     const task = {
       PartitionKey: entGen.String('users'),
       RowKey: entGen.String(uid(16)),
-      userId: entGen.String(uid()),
+      inspectionId: entGen.String(inspectionId),
       ...inspectionData,
-      inspectionPending: entGen.String('true'),
       policyAssociated: entGen.String(''),
-      inspectionAssociated: entGen.String('')
     };
     tableService.insertEntity(TABLE_NAME, task,  (error, result) => {
       if(!error){
         // Entity inserted
-        router.push('/Inspections');
+        callback(inspectionId)
+        
       } else {
         setError(error.message)
       }
     });
   }
-  const update = (data:any) => {
-
+  const updateIDV = (inspectionId:string, idv:string) => {
+    setError('')
+    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    const entGen = azure.TableUtilities.entityGenerator;
+    
+    const task = {
+      inspectionId: entGen.String(inspectionId),
+    };
+    tableService.insertEntity(TABLE_NAME, task,  (error, result) => {
+      if(!error){
+        // Entity inserted
+        callback(inspectionId)
+        
+      } else {
+        setError(error.message)
+      }
+    });
   }
 
   return {
@@ -119,7 +132,7 @@ function useProvideInspectionStorage() {
     fetch,
     fetchAll,
     insert,
-    update,
+    updateIDV,
 
   }
 }

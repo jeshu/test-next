@@ -1,13 +1,15 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Alert from '@material-ui/lab/Alert';
-import Hero from 'components/Hero';
 import DoranDataTable from 'components/DoranDataTable';
+import Link from 'next/link';
+import { useInspectionStorage } from 'lib/useInspectionData';
 import { makeStyles } from '@material-ui/core/styles';
+import { calculatePreHarvest } from 'utils/IDVCalculator';
 
 const useStyles = makeStyles((theme) => ({
   topShift: {
@@ -24,15 +26,46 @@ const useStyles = makeStyles((theme) => ({
     '& button': {
       marginLeft: theme.spacing(2)
     }
-  }
+  },
+  textfield: {
+    marginLeft: theme.spacing(1)
+  },
 }))
 
 
 export default function NewInspection({ id }) {
   const classes = useStyles();
+  const preInspectionIDV = 1500000;
   const [recommendation, setRecommendation] = useState(null);
+  const [inspectionId, setInspectionId] = useState('');
+  const [inspectionStarted, setInspectionStarted] = useState(false);
+  const [enableCalculator, setEnableCalculator] = useState(false);
+  const { insert, updateIDV } = useInspectionStorage();
+  const [avgValues, setAvgValues] = useState(null);
+  const startInspection = () => {
+    insert({
+      IDV: 0,
+      customerId: id
+    }, (inspectionId) => {
+      setInspectionId(inspectionId)
+      setInspectionStarted(true);
+    });
+  };
+
+  const onSimulationEnd = (_avgValues) => {
+    setInspectionStarted(false);
+    setEnableCalculator(true)
+    setAvgValues(_avgValues)
+    const idv = calculatePreHarvest(_avgValues, preInspectionIDV)
+    // updateIDV(inspectionId, idv)
+  }
+  const calculateIDV = () => {
+    
+  }
+
+
   const renderRecomandatios = () => {
-    return (recommendation? <Grid item xs={12} className={classes.sliderBase}>
+    return (recommendation ? <Grid item xs={12} className={classes.sliderBase}>
       <Box >
         <Alert severity="info" className={classes.alert}>This is the recommendation for the farmer.
       <Button variant="outlined" color="secondary">
@@ -40,7 +73,7 @@ export default function NewInspection({ id }) {
       </Button>
         </Alert>
       </Box>
-    </Grid>: null)
+    </Grid> : null)
   }
   return (
     <Box>
@@ -53,14 +86,64 @@ export default function NewInspection({ id }) {
               color="inherit"
               gutterBottom
             >
-              Inspection
+              Inspection with Droan
+              
+            <Typography
+              component="span"
+              variant="h6"
+              color="inherit"
+              gutterBottom
+            >
+              {inspectionId && ` (${inspectionId})`}
+            </Typography>
+            </Typography>
+            {preInspectionIDV && 
+            <>
+              <Typography
+                component="h6"
+                variant="h6"
+                color="inherit"
+                gutterBottom
+              >
+                Base line IDV : {preInspectionIDV.toLocaleString()} Rs.
+              </Typography> 
+              <Typography
+                component="h6"
+                variant="h6"
+                color="inherit"
+                gutterBottom
+              >
+                IDV after Inspection : 120000 Rs.
+              </Typography> 
+              <Typography
+                component="h6"
+                variant="h6"
+                color="inherit"
+                gutterBottom
+              >
+                Single Premium : 3000 Rs. per month
               </Typography>
-            <Button variant="outlined" color="secondary">
-              Start Inspection
+              </>
+            }
+            {!inspectionStarted && !enableCalculator &&
+              <Button variant="outlined" color="secondary" onClick={startInspection}>
+                Start Inspection
+            </Button>}
+            {enableCalculator && 
+            <>
+            <Button variant="outlined" color="secondary" onClick={calculateIDV}>
+              Create policy
             </Button>
+            <Link href={`/customer/${id}`}>
+              <Button variant="outlined" color="secondary">
+                Save
+              </Button>
+            </Link>
+            </>
+            }
           </Grid>
           {renderRecomandatios()}
-          <Grid item xs={12} className={classes.sliderBase}>
+          {(inspectionStarted || enableCalculator) && <Grid item xs={12} className={classes.sliderBase}>
             <Typography
               component="h5"
               variant="h5"
@@ -69,17 +152,19 @@ export default function NewInspection({ id }) {
             >
               Feeds from Doran
             </Typography>
-            <DoranDataTable />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            Recomadations...
-            </Grid>
+            <DoranDataTable
+              customerId={id}
+              inspectionId={inspectionId}
+              inspectionStarted={inspectionStarted}
+              onSimulationEnd={onSimulationEnd}
+            />
+          </Grid>}
         </Grid>
       </Container>
     </Box>
   );
 }
 
-NewInspection.getInitialProps = ({ query: { id, claimId } }) => {
-  return { id, claimId };
+NewInspection.getInitialProps = ({ query: { id } }) => {
+  return { id };
 };

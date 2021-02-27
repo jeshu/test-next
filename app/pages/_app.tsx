@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { AuthProvider } from 'lib/useAuth';
 import { DroanStorageProvider } from 'lib/useDroanStorage';
 import { CustomerStorageProvider } from 'lib/useCustomerData';
+import { InspectionStorageProvider } from 'lib/useInspectionData';
 import Header from 'components/Header';
 
 export default function MyApp(props) {
@@ -28,12 +29,14 @@ export default function MyApp(props) {
     <ThemeProvider theme={darkState ? themeDark : themeLight}>
       <CssBaseline />
       <CustomerStorageProvider>
+      <InspectionStorageProvider>
       <DroanStorageProvider>
         <AuthProvider>
           <Header darkState={darkState} handleThemeChange={handleThemeChange} />
           <Component {...pageProps} />
         </AuthProvider>
       </DroanStorageProvider>
+      </InspectionStorageProvider>
       </CustomerStorageProvider>
     </ThemeProvider>
   );

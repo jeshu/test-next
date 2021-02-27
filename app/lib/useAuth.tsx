@@ -28,8 +28,6 @@ function useProvideAuth() {
 
   useEffect(() => {
     console.log(user, sessionStorage.getItem(user));
-    
-    
   }, [])
   const signIn = async (email, password) => {
     console.log(`signIn called, ${email} ${password}`);
@@ -37,7 +35,7 @@ function useProvideAuth() {
       sessionStorage.setItem('token', '123456');
       sessionStorage.setItem('user', 'jeshu911@gmail.com');
       setUser({email, policyId:'AX-258963', _id:'ax-9887'})
-      router.push('/customers');
+      router.push('/customer');
     } else {
       setError("Invalid Login");
     }

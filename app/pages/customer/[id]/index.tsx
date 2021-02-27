@@ -4,7 +4,7 @@ import Hero from 'components/Hero';
 import PersonalInfo from 'components/PersonalInfo';
 import React from 'react';
 import Box from '@material-ui/core/Box';
-import ClaimsHistory from 'components/ClaimsHistory';
+import InspectionTable from 'components/InspectionTable';
 import { useCustomerStorage } from 'lib/useCustomerData';
 
 export default function CustomerDetails({ id }) {
@@ -27,7 +27,7 @@ export default function CustomerDetails({ id }) {
       />
       <PersonalInfo {...personalinfo} />
       <Box>
-        <ClaimsHistory policyId={id} />
+        <InspectionTable customerId={id} />
       </Box>
     </>
   );
