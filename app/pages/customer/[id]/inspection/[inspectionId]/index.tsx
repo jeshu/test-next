@@ -95,7 +95,7 @@ export default function NewInspection({ id, inspectionId }) {
     updatePolicy(inspectionData.policyAssociated, {
       claimAmount : idv.IDV 
     })
-    router.push(`/customer/${id}`)
+    router.push(`/customer/${id}/policy/${inspectionData.policyAssociated}`)
   }
 
   const renderRecomandatios = () => {

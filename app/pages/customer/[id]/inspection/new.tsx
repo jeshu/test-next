@@ -96,7 +96,7 @@ export default function NewInspection({ id }) {
       baseIDV,
       farmArea, expectedYeild, expectedMarketPrice, coveragePeriod, ...idv
     }, (policyId) =>{
-      updateInspectionData(inspectionId, {policyAssociated:policyId})
+      updateInspectionData(inspectionId, {policyAssociated:policyId, ...idv})
       updateCustomerData(id, {policyAssociated:policyId})
       router.push(`/customer/${id}/policy/${policyId}`)
     })
@@ -210,13 +210,11 @@ export default function NewInspection({ id }) {
             <Button variant="outlined" color="secondary" onClick={calculateIDV}>
               Create policy
             </Button>
-            <Link href={`/customer/${id}`} >
               <Button variant="outlined" color="secondary" style={{marginLeft:'1rem'}} onClick={()=>{
                 updateInspectionData(inspectionId, idv)
               }}>
                 Save
               </Button>
-            </Link>
             </>
             }
           </Grid>
