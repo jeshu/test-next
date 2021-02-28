@@ -74,37 +74,37 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
       fetch(customerId, inspectionId)
     }
   }, [inspectionStarted, fetchCounter])
-  const [counter, setCounter] = useState(0);
+  // const [counter, setCounter] = useState(0);
   useEffect(() => {
     if (inspectionStarted === true) {
       const lastData = data && data.find((item: any) => item.isDone === 'true')
-      if (lastData || counter > 20) {
+      if (lastData ) { //|| counter > 20
         onSimulationEnd(avgValues)
       } else {
-        setTimeout(() => {
-          insert({
-            Cultivatedland: Math.round(10 + (Math.random() * 10)),
-            UnFertileLand: Math.round(10 + (Math.random() * 10)),
-            OtherAreas: Math.round(10 + (Math.random() * 10)),
-            HighQualityCrop: Math.round(10 + (Math.random() * 10)),
-            LowQualityCrop: Math.round(10 + (Math.random() * 10)),
-            DamageArea: Math.round(10 + (Math.random() * 10)),
-            Temperature: Math.round(33 + (Math.random() * 10)),
-            Humidity: Math.round(80 + (Math.random() * 10)),
-            WindSpeed: Math.round(38 + (Math.random() * 10)),
-            Moisture: Math.round(14 + (Math.random() * 10)),
-            DroneHeight: Math.round(10 + (Math.random() * 10)),
-            DroneCameraResolution: Math.round(10 + (Math.random() * 10)),
-            customerId,
-            inspectionId,
-            isDone: counter > 20 ? 'true' : 'false'
-          })
-          setCounter(counter + 1);
-        }, 1000)
+        // setTimeout(() => {
+        //   insert({
+        //     Cultivatedland: Math.round(10 + (Math.random() * 10)),
+        //     UnFertileLand: Math.round(10 + (Math.random() * 10)),
+        //     OtherAreas: Math.round(10 + (Math.random() * 10)),
+        //     HighQualityCrop: Math.round(10 + (Math.random() * 10)),
+        //     LowQualityCrop: Math.round(10 + (Math.random() * 10)),
+        //     DamageArea: Math.round(10 + (Math.random() * 10)),
+        //     Temperature: Math.round(33 + (Math.random() * 10)),
+        //     Humidity: Math.round(80 + (Math.random() * 10)),
+        //     WindSpeed: Math.round(38 + (Math.random() * 10)),
+        //     Moisture: Math.round(14 + (Math.random() * 10)),
+        //     DroneHeight: Math.round(10 + (Math.random() * 10)),
+        //     DroneCameraResolution: Math.round(10 + (Math.random() * 10)),
+        //     customerId,
+        //     inspectionId,
+        //     isDone: counter > 20 ? 'true' : 'false'
+        //   })
+        //   setCounter(counter + 1);
+        // }, 1000)
       }
     }
 
-  }, [counter, data, inspectionStarted])
+  }, [data, inspectionStarted]) //counter
 
 
   return (
