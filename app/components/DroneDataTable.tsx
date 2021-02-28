@@ -12,6 +12,7 @@ import TableRow from '@material-ui/core/TableRow';
 import { useDroneStorage } from 'lib/useDroneStorage';
 import { averageFieldData } from 'utils/IDVCalculator';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -34,6 +35,13 @@ const useStyles = makeStyles((theme) => ({
   },
   spinner: {
     marginLeft: theme.spacing(2)
+  },
+
+  noContentMsg: {
+    display: 'grid',
+    placeItems: 'center',
+    minHeight: theme.spacing(10),
+    marginTop: theme.spacing(3)
   }
 }));
 
@@ -61,7 +69,7 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
       } else {
         setFetchCounter(0)
       }
-    }, 10000)
+    }, 3000)
     if (fetchCounter === 0) {
       fetch(customerId, inspectionId)
     }
@@ -119,13 +127,13 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
               <TableRow>
                 <TableCell align='center'>Image</TableCell>
                 {rows && rows[0] && Object.keys(rows[0]).map((_key, index) => (
-                  <TableCell key={`${_key}-${index}`}align={index === 0 ? 'left' : 'center'}>{_key.toUpperCase()}</TableCell>
+                  <TableCell key={`${_key}-${index}`} align={index === 0 ? 'left' : 'center'}>{_key.toUpperCase()}</TableCell>
                 ))}
               </TableRow>
             </TableHead>
-            
+
             <TableFooter>
-              </TableFooter>
+            </TableFooter>
 
             <TableBody className={classes.tableBody}>
               <TableRow>
@@ -134,7 +142,7 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
                   <TableCell key={`${_value}-${index}`} align={index === 0 ? 'left' : 'center'} color={'primary'}>{_value}</TableCell>
                 ))}
               </TableRow>
-            
+
               {rows.map((row) => (
                 <TableRow key={row.name}>
                   <TableCell align='center'>
@@ -154,8 +162,11 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
         </TableContainer>
       </Box>
       :
-      <Box>
-        Preparing the Drone...
+      <Box className={classes.noContentMsg}>
+        <FlightTakeoffIcon fontSize="large" color="primary"/>
+        <Typography variant="h6" id="tableTitle" component="span">
+          Preparing Drone to gather information
+          </Typography>
       </Box>
   );
 }

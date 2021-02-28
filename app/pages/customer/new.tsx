@@ -42,10 +42,11 @@ export default function NewCustomer() {
   const [pincode, setPincode] = useState('');
   const [experience, setExperience] = useState('');
   const [cropType, setCropType] = useState('');
+  const [premiumRate, setPremiumRate] = useState('2');
   const [farmArea, setFarmArea] = useState('');
   const [expectedYeild, setExpectedYeild] = useState('');
   const [expectedMarketPrice, setExpectedMarketPrice] = useState('');
-  const [coveragePeriod, setCoveragePeriod] = useState('');
+  const [coveragePeriod, setCoveragePeriod] = useState('4');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
 
@@ -109,6 +110,7 @@ export default function NewCustomer() {
                 <FormControlLabel value="male" control={<Radio />} label="Male" />
               </RadioGroup>
             </FormControl>
+            <Box pb={2.5} />
             <TextField
               value={cropType}
               onChange={(e) => setCropType(e.target.value)}
@@ -126,6 +128,7 @@ export default function NewCustomer() {
               fullWidth={true}
               required
             />
+            <Box pb={2.5} />
             <TextField
               value={pincode}
               onChange={(e) => setPincode(e.target.value)}
@@ -149,6 +152,16 @@ export default function NewCustomer() {
               onChange={(e) => setExperience(e.target.value)}
               className="form-control"
               label="Experience"
+              fullWidth={true}
+              required
+            />
+            <Box pb={2.5} />
+            <TextField
+              value={premiumRate}
+              onChange={(e) => setPremiumRate(e.target.value)}
+              className="form-control"
+              type='number'
+              label="Premium Rate (%)"
               fullWidth={true}
               required
             />

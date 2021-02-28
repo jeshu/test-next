@@ -10,6 +10,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import IconButton from '@material-ui/core/IconButton';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import ArrowForward from '@material-ui/icons/ArrowForward';
 import Link from 'next/link';
 import { makeStyles, Theme } from '@material-ui/core/styles';
@@ -45,6 +46,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxHeight: '100px',
     outline: '4px solid black',
     padding: '2px',
+  },
+  noContentMsg: {
+    display:'grid',
+    placeItems:'center',
+    minHeight: theme.spacing(10),
+    marginTop:theme.spacing(3) 
   }
 }));
 
@@ -109,8 +116,11 @@ const InspectionTable = ({ customerId, policyId = '', isInspectionPage = false }
             </Table>
           </TableContainer>
           :
-          <Box>
-            Data not available
+          <Box className={classes.noContentMsg}>
+            <ErrorOutlineIcon color="primary" fontSize='large'/>
+            <Typography variant="h6" id="tableTitle" component="span">
+              No Records Found
+            </Typography>
           </Box>}
       </Container>
     </Paper>

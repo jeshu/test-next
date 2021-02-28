@@ -166,7 +166,7 @@ export default function NewInspection({ id, inspectionId }) {
                 color="inherit"
                 gutterBottom
               >
-                IDV after Inspection : {idv? idv.IDV : inspectionData && parseFloat(inspectionData.IDV).toFixed(2)} Rs.
+                IDV after Inspection : {idv? parseFloat(`${idv.IDV}`).toFixed(2) : inspectionData && parseFloat(inspectionData.IDV).toFixed(2)} Rs.
               </Typography> 
               {inspectionData?.premium &&
               <Typography

@@ -34,7 +34,7 @@ const __policyData = [{
   unit: 'Rs',
 }, {
   key:'premium',
-  label: 'Premium',
+  label: 'Single Premium',
   unit: 'Rs',
 }, {
   key:'coveragePeriod',
@@ -67,7 +67,7 @@ export default function PolicyDetails({ id, policyId }) {
     if(policyData) {
       const data = __policyData.map(item=>{
         if(item.key) 
-          item.value = policyData[item.key]
+          item.value = policyData[item.key] || '-'
         return item;
       });
       setPolicyInfo(data)

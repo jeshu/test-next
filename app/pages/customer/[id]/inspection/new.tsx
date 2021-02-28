@@ -12,7 +12,7 @@ import { useInspectionStorage } from 'lib/useInspectionData';
 import { useCustomerStorage } from 'lib/useCustomerData';
 import { usePolicyStorage } from 'lib/usePolicyData';
 import { makeStyles } from '@material-ui/core/styles';
-import { calculatePreHarvest, getRecommanation } from 'utils/IDVCalculator';
+import { calculatePreHarvest, getRecommanation, getBaseIDV , PREMIUM_RATE} from 'utils/IDVCalculator';
 
 const useStyles = makeStyles((theme) => ({
   topShift: {
@@ -33,14 +33,27 @@ const useStyles = makeStyles((theme) => ({
   textfield: {
     marginLeft: theme.spacing(1)
   },
+  recommendation: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent:'space-between',
+    marginBottom:theme.spacing(3)
+  },
+  edittable: {
+    padding: theme.spacing(0.25,1),
+    '&:focus' :{
+      backgroundColor:'rgba(0,0,0,0.1)',
+      outline :'none'
+    }
+  }
 }))
 
 
 export default function NewInspection({ id }) {
   const router = useRouter()
   const classes = useStyles();
-  const preInspectionIDV = 1500000;
   const [inspectionId, setInspectionId] = useState('');
+  const [baseIDV, setBaseIDV] = useState('');
   const [inspectionStarted, setInspectionStarted] = useState(false);
   const [enableCalculator, setEnableCalculator] = useState(false);
   const { insert:addPolicy } = usePolicyStorage();
@@ -51,6 +64,11 @@ export default function NewInspection({ id }) {
   useEffect(() => {
     fetchCustomerData(id);
   }, [])
+  useEffect(() =>{
+    if(customerData) {
+      setBaseIDV(getBaseIDV(customerData));
+    }
+  }, [customerData])
 
   const startInspection = () => {
     insert({
@@ -65,16 +83,17 @@ export default function NewInspection({ id }) {
   const onSimulationEnd = (_avgValues) => {
     setInspectionStarted(false);
     setEnableCalculator(true)
-    const idvCalcualte =  calculatePreHarvest(_avgValues, preInspectionIDV)
+    const idvCalcualte =  calculatePreHarvest(_avgValues, baseIDV, (parseFloat(customerData.premiumRate) || PREMIUM_RATE))
     const recomadations = getRecommanation(_avgValues);
-    updateInspectionData(inspectionId, {recomadations, ...idvCalcualte})
     setIDV({recomadations, ...idvCalcualte})
+    updateInspectionData(inspectionId, {recomadations, ...idvCalcualte})
   }
   const calculateIDV = () => {
     const {farmArea, expectedYeild, expectedMarketPrice, coveragePeriod} = customerData;
     console.log(customerData)
     addPolicy({
       customerId: id,
+      baseIDV,
       farmArea, expectedYeild, expectedMarketPrice, coveragePeriod, ...idv
     }, (policyId) =>{
       updateInspectionData(inspectionId, {policyAssociated:policyId})
@@ -90,15 +109,17 @@ export default function NewInspection({ id }) {
       const recommendation = recomStr.split("##");
       return (
         <Grid item xs={12} className={classes.sliderBase}>
+          <Box className={classes.recommendation}>
             <Typography
                 component="h6"
-                variant="h6"
+                variant="h5"
                 color="inherit"
                 gutterBottom
               >
                 Recommendation(s) based on Inspection
               </Typography> 
               <Button variant="outlined" color="secondary">Notify</Button>
+          </Box>
           <Box >
             {recommendation.map(item=>(
 
@@ -135,31 +156,48 @@ export default function NewInspection({ id }) {
               {inspectionId && ` (${inspectionId})`}
             </Typography>
             </Typography>
-            {idv && 
+            {baseIDV && idv && 
             <>
+            
               <Typography
                 component="h6"
                 variant="h6"
                 color="inherit"
                 gutterBottom
               >
-                Base line IDV : {preInspectionIDV.toLocaleString()} Rs.
+                Base line IDV : {baseIDV} Rs.
               </Typography> 
               <Typography
                 component="h6"
                 variant="h6"
                 color="inherit"
                 gutterBottom
-              >
-                IDV after Inspection : {idv.IDV} Rs.
+                >
+                IDV after Inspection : 
+                <Typography
+                  variant="inherit"
+                  color="inherit"
+                  contentEditable
+                  className={classes.edittable}
+                  onBlur={(e)=>{
+                    if(!isNaN(parseFloat(e.target.innerHTML))) {
+                      const newIDV = {...idv, IDV:e.target.innerHTML}
+                      newIDV.premium = newIDV.IDV * (parseFloat(customerData.premiumRate) || PREMIUM_RATE)/100
+                      setIDV(newIDV)
+                    }
+                  }}
+                  >
+                  {parseFloat(`${idv.IDV}`).toFixed(2)}
+                </Typography>
+                 Rs.
               </Typography> 
               <Typography
                 component="h6"
                 variant="h6"
                 color="inherit"
                 gutterBottom
-              >
-                Single Premium : {idv.premium} Rs.
+                >
+                Single Premium :{parseFloat(`${idv.premium}`).toFixed(2)} Rs.
               </Typography>
               </>
             }
@@ -172,8 +210,10 @@ export default function NewInspection({ id }) {
             <Button variant="outlined" color="secondary" onClick={calculateIDV}>
               Create policy
             </Button>
-            <Link href={`/customer/${id}`}>
-              <Button variant="outlined" color="secondary">
+            <Link href={`/customer/${id}`} >
+              <Button variant="outlined" color="secondary" style={{marginLeft:'1rem'}} onClick={()=>{
+                updateInspectionData(inspectionId, idv)
+              }}>
                 Save
               </Button>
             </Link>

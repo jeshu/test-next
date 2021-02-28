@@ -60,7 +60,7 @@ export default function Customer() {
     direction="column"
     style={{ minHeight: 'calc(100vh - 64px)', padding: '64px' }}>
     <Box className={classes.bottemGap}>
-      <Typography variant="h4">New Customer</Typography>
+      <Typography variant="h4">Prospect Customer</Typography>
       <List className={classes.root}>
         {newCustomer && newCustomer.map((item, index) =>
           <Box key={item.userId}>
