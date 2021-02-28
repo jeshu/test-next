@@ -6,12 +6,12 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Alert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
-import DoranDataTable from 'components/DoranDataTable';
+import DroneDataTable from 'components/DroneDataTable';
 import Link from 'next/link';
 import {useRouter} from 'next/router';
 import { useInspectionStorage } from 'lib/useInspectionData';
 import { usePolicyStorage } from 'lib/usePolicyData';
-import { calculatePostHarvest } from 'utils/IDVCalculator';
+import { calculatePostHarvest, getRecommanation } from 'utils/IDVCalculator';
 
 const useStyles = makeStyles((theme) => ({
   topShift: {
@@ -39,17 +39,30 @@ export default function NewInspection({ id, inspectionId }) {
   const router = useRouter()
   const classes = useStyles();
   const preInspectionIDV = 1500000;
-  const [recommendation, setRecommendation] = useState(null);
   const [newInspectionId, setNewInspectionId] = useState(null);
   const [inspectionStarted, setInspectionStarted] = useState(false);
   const [enableCalculator, setEnableCalculator] = useState(false);
-  const { policyData, fetch:Fw, update:updatePolicy } = usePolicyStorage();
+  const [claimPending, setClaimPending] = useState(true);
+  const { policyData, fetch:fetchPolicy, update:updatePolicy } = usePolicyStorage();
   const { inspectionData, fetch:fetchInspectionData, insert:insertInspection, update:updateInspectionData } = useInspectionStorage();
   const [idv, setIDV] = useState(null);
 
   useEffect(() => {
     fetchInspectionData(inspectionId);
   }, [])
+
+  useEffect(()=>{
+    if(inspectionData) {
+      fetchPolicy(inspectionData.policyAssociated);
+    }
+  }, [inspectionData])
+
+  useEffect(() => {
+    if(policyData)
+      if(policyData.claimAmount) {
+        setClaimPending(false)
+    }
+  }, [policyData])
 
   const startInspection = () => {
     console.log(inspectionData.policyAssociated);
@@ -67,7 +80,9 @@ export default function NewInspection({ id, inspectionId }) {
   const onSimulationEnd = (_avgValues) => {
     setInspectionStarted(false);
     setEnableCalculator(true);
-    setIDV(calculatePostHarvest(_avgValues, inspectionData.IDV))
+    const recomadations = getRecommanation(_avgValues);
+    const idvCalcualte =  calculatePostHarvest(_avgValues, policyData.IDV)
+    setIDV({recomadations, ...idvCalcualte})
   }
 
   useEffect(() => {
@@ -83,18 +98,35 @@ export default function NewInspection({ id, inspectionId }) {
     router.push(`/customer/${id}`)
   }
 
-
   const renderRecomandatios = () => {
-    return (recommendation ? <Grid item xs={12} className={classes.sliderBase}>
-      <Box >
-        <Alert severity="info" className={classes.alert}>This is the recommendation for the farmer.
-      <Button variant="outlined" color="secondary">
-            Notify
-      </Button>
-        </Alert>
-      </Box>
-    </Grid> : null)
+    const recomStr = idv?.recomadations || inspectionData?.recomadations || '';
+    if(recomStr) {
+      const recommendation = recomStr.split("##");
+      return (
+        <Grid item xs={12} className={classes.sliderBase}>
+            <Typography
+                component="h6"
+                variant="h6"
+                color="inherit"
+                gutterBottom
+              >
+                Recommendation(s) based on Inspection
+              </Typography> 
+          <Box >
+            {recommendation.map(item=>(
+
+              <Alert severity="info" className={classes.alert}>
+                {item}
+              </Alert>
+            )
+            )}
+          </Box>
+        </Grid>
+      )
+    } 
+    return null;
   }
+  
   return (
     <Box>
       <Container className={classes.topShift}>
@@ -106,8 +138,7 @@ export default function NewInspection({ id, inspectionId }) {
               color="inherit"
               gutterBottom
             >
-              Inspection with Droan
-              
+              Inspection with Drone
             <Typography
               component="span"
               variant="h6"
@@ -119,40 +150,61 @@ export default function NewInspection({ id, inspectionId }) {
             </Typography>
              
             <>
+              {policyData && policyData.IDV &&
               <Typography
                 component="h6"
                 variant="h6"
                 color="inherit"
                 gutterBottom
               >
-                Base line IDV : {preInspectionIDV.toLocaleString()} Rs.
-              </Typography> 
-              <Typography
-                component="h6"
-                variant="h6"
-                color="inherit"
-                gutterBottom
-              >
-                IDV after Inspection : {120000} Rs.
-              </Typography> 
-              <Typography
-                component="h6"
-                variant="h6"
-                color="inherit"
-                gutterBottom
-              >
-                Single Premium : 3000 Rs. per month
+                Sum Assured : {policyData.IDV} Rs.
               </Typography>
+              } 
+              <Typography
+                component="h6"
+                variant="h6"
+                color="inherit"
+                gutterBottom
+              >
+                IDV after Inspection : {idv? idv.IDV : inspectionData && parseFloat(inspectionData.IDV).toFixed(2)} Rs.
+              </Typography> 
+              {inspectionData?.premium &&
+              <Typography
+                component="h6"
+                variant="h6"
+                color="inherit"
+                gutterBottom
+              >
+                Single Premium : {inspectionData && inspectionData.premium} Rs.
+              </Typography>}
               </>
             
-            {!inspectionStarted && !enableCalculator &&
+            {!claimPending && policyData &&
+              <>
+              <Typography
+                component="h6"
+                variant="h6"
+                color="inherit"
+                gutterBottom
+              >
+                Claim is settled at {policyData ? ` ${parseFloat(policyData.claimAmount).toFixed(2)} Rs.` :''}
+              </Typography>
+              <Link href={`/customer/${id}/policy/${policyData.policyId}`}>
+                <Button variant="outlined" color="secondary">
+                  Back to Policy
+                </Button>
+              </Link>
+              </>
+            }
+            
+            {claimPending && !inspectionStarted && !enableCalculator &&
               <Button variant="outlined" color="secondary" onClick={startInspection}>
                 Start New Inspection
             </Button>}
-            {enableCalculator && 
+            {claimPending && enableCalculator && 
             <>
             <Button variant="outlined" color="secondary" onClick={convertToClaims}>
-              Convet to Claim
+              Convert to Claim
             </Button>
             <Link href={`/customer/${id}`}>
               <Button variant="outlined" color="secondary">
@@ -164,7 +216,7 @@ export default function NewInspection({ id, inspectionId }) {
           </Grid>
           {renderRecomandatios()}
           <Grid item xs={12} className={classes.sliderBase}>
-            <DoranDataTable
+            <DroneDataTable
               customerId={id}
               inspectionId={newInspectionId || inspectionId}
               inspectionStarted={inspectionStarted}

@@ -36,24 +36,29 @@ export default function SignIn() {
         direction="column"
         alignItems="center"
         justify="center"
-        style={{ minHeight: 'calc(100vh - 64px)' }}>
+        style={{ minHeight: 'calc(100vh)' }}>
         <Paper elevation={9} style={{ padding: '64px' }}>
           <form onSubmit={onSubmit}>
             {error && <p>{error}</p>}
-            <Typography variant="h4">Sign In</Typography>
-            <Box pb={2.5} />
+            <Typography variant="h3">Dronify Agro Insurance</Typography>
+            <Typography variant="h6" color="primary">Insurer portal</Typography>
+            <Box pb={5} />
+            <Typography variant="h5">Sign In</Typography>
+            <Box pb={1} />
             <TextField
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="form-control"
               label="Email"
+              fullWidth={true}
               required
-            />
+              />
             <Box pb={2.5} />
             <TextField
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"
+              fullWidth={true}
               className="form-control"
               label="Password"
               required

@@ -9,16 +9,14 @@ import {
   Switch,
 } from '@material-ui/core';
 import Link from 'next/link';
-import { useAuth } from 'lib/useAuth';
 
 export default function Header({ darkState, handleThemeChange }) {
   const classes = useStyles();
-  const { user } = useAuth();
 
   const links = [
-    !user && { label: 'Sign In', href: '/auth/signin' },
-    user && { label: 'Customers', href: '/userlist' },
-    user && { label: 'Sign Out', href: '/auth/signout' },
+    { label: 'Customers', href: '/customer' },
+    { label: 'Add Customer', href: '/customer/new' },
+    { label: 'Sign Out', href: '/' },
   ]
     .filter((link) => link)
     .map(({ label, href }) => {
@@ -34,9 +32,9 @@ export default function Header({ darkState, handleThemeChange }) {
       <AppBar position="static">
           <Toolbar>
             <Typography variant="h6" className={classes.title}>
-              <Link href="/">
+              <Link href="/customer">
                 <LinkText href="" color="inherit">
-                  Insurence with Drone
+                Dronify Agro Insurance
               </LinkText>
               </Link>
             </Typography>

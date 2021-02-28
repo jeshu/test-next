@@ -12,7 +12,7 @@ const themeDark = createMuiTheme({
 
 const themeLight = createMuiTheme({
   palette: {
-    primary: { main: blue[600] },
+    primary: { main: blue[800] },
     secondary: { main: blue[700] },
     type: "light",
   },

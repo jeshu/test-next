@@ -9,7 +9,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableFooter from '@material-ui/core/TableFooter';
 import TableRow from '@material-ui/core/TableRow';
-import { useDroanStorage } from 'lib/useDroanStorage';
+import { useDroneStorage } from 'lib/useDroneStorage';
 import { averageFieldData } from 'utils/IDVCalculator';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
@@ -37,8 +37,8 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const DoranDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulationEnd }) => {
-  const { data, fetch, insert } = useDroanStorage()
+const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulationEnd }) => {
+  const { data, fetch, insert } = useDroneStorage()
   const classes = useStyles();
   const [avgValues, setAvgValues] = useState(null)
   const rows: any = data && data.sort((a: any, b: any) => (b.Timestamp > a.Timestamp) ? 1 : -1)
@@ -81,10 +81,10 @@ const DoranDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
             HighQualityCrop: Math.round(10 + (Math.random() * 10)),
             LowQualityCrop: Math.round(10 + (Math.random() * 10)),
             DamageArea: Math.round(10 + (Math.random() * 10)),
-            Temperature: Math.round(10 + (Math.random() * 10)),
-            Humidity: Math.round(10 + (Math.random() * 10)),
-            WindSpeed: Math.round(10 + (Math.random() * 10)),
-            Moisture: Math.round(10 + (Math.random() * 10)),
+            Temperature: Math.round(33 + (Math.random() * 10)),
+            Humidity: Math.round(80 + (Math.random() * 10)),
+            WindSpeed: Math.round(38 + (Math.random() * 10)),
+            Moisture: Math.round(14 + (Math.random() * 10)),
             DroneHeight: Math.round(10 + (Math.random() * 10)),
             DroneCameraResolution: Math.round(10 + (Math.random() * 10)),
             customerId,
@@ -109,7 +109,7 @@ const DoranDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
             color="inherit"
             gutterBottom
           >
-            Feeds from Doran
+            Feeds from Drone
         </Typography>
           {inspectionStarted && <CircularProgress className={classes.spinner} />}
         </Box>
@@ -117,42 +117,46 @@ const DoranDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
           <Table className={classes.table} aria-label="simple table" stickyHeader={true}>
             <TableHead>
               <TableRow>
-                {rows && rows[0] && Object.keys(rows[0]).map((_key, index) => (
-                  <TableCell align={index === 0 ? 'left' : 'center'}>{_key.toUpperCase()}</TableCell>
-                ))}
                 <TableCell align='center'>Image</TableCell>
+                {rows && rows[0] && Object.keys(rows[0]).map((_key, index) => (
+                  <TableCell key={`${_key}-${index}`}align={index === 0 ? 'left' : 'center'}>{_key.toUpperCase()}</TableCell>
+                ))}
               </TableRow>
             </TableHead>
+            
+            <TableFooter>
+              </TableFooter>
+
             <TableBody className={classes.tableBody}>
+              <TableRow>
+                <TableCell >Avg Values</TableCell>
+                {avgValues && Object.values(avgValues).map((_value, index) => (
+                  <TableCell key={`${_value}-${index}`} align={index === 0 ? 'left' : 'center'} color={'primary'}>{_value}</TableCell>
+                ))}
+              </TableRow>
+            
               {rows.map((row) => (
                 <TableRow key={row.name}>
-                  {Object.values(row).map((_value, index) => (
-                    <TableCell component="th" scope="row" align={index === 0 ? 'left' : 'center'}>
-                      {_value}
-                    </TableCell>)
-                  )}
                   <TableCell align='center'>
                     <a href='https://images.unsplash.com/photo-1437252611977-07f74518abd7?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8d2hlYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&w=1000&q=80' target="_blank">
                       <img className={classes.image} src="https://images.unsplash.com/photo-1437252611977-07f74518abd7?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8d2hlYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&w=1000&q=80" />
                     </a>
                   </TableCell>
+                  {Object.values(row).map((_value, index) => (
+                    <TableCell key={`${_value}-${index}`} component="th" scope="row" align={index === 0 ? 'left' : 'center'}>
+                      {_value}
+                    </TableCell>)
+                  )}
                 </TableRow>
               ))}
             </TableBody>
-            <TableFooter>
-              <TableRow>
-                {avgValues && Object.values(avgValues).map((_value, index) => (
-                  <TableCell align={index === 0 ? 'left' : 'center'}>{_value}</TableCell>
-                ))}
-              </TableRow>
-            </TableFooter>
           </Table>
         </TableContainer>
       </Box>
       :
       <Box>
-        Preparing the Droan...
+        Preparing the Drone...
       </Box>
   );
 }
-export default DoranDataTable
+export default DroneDataTable

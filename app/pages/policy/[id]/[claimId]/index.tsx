@@ -5,7 +5,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Alert from '@material-ui/lab/Alert';
 import Hero from 'components/Hero';
-import DoranDataTable from 'components/DoranDataTable';
+import DroneDataTable from 'components/DroneDataTable';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -129,9 +129,9 @@ export default function ClaimsDetails({ id, claimId }) {
                 color="inherit"
                 gutterBottom
               >
-                Feeds from Doran
+                Feeds from Drone
             </Typography>
-              <DoranDataTable />
+              <DroneDataTable />
             </Grid>
             <Grid item xs={12} md={6}> 
               Recomadations...

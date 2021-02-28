@@ -5,14 +5,14 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Alert from '@material-ui/lab/Alert';
-import DoranDataTable from 'components/DoranDataTable';
+import DroneDataTable from 'components/DroneDataTable';
 import Link from 'next/link';
 import {useRouter} from 'next/router';
 import { useInspectionStorage } from 'lib/useInspectionData';
 import { useCustomerStorage } from 'lib/useCustomerData';
 import { usePolicyStorage } from 'lib/usePolicyData';
 import { makeStyles } from '@material-ui/core/styles';
-import { calculatePreHarvest } from 'utils/IDVCalculator';
+import { calculatePreHarvest, getRecommanation } from 'utils/IDVCalculator';
 
 const useStyles = makeStyles((theme) => ({
   topShift: {
@@ -40,11 +40,10 @@ export default function NewInspection({ id }) {
   const router = useRouter()
   const classes = useStyles();
   const preInspectionIDV = 1500000;
-  const [recommendation, setRecommendation] = useState(null);
   const [inspectionId, setInspectionId] = useState('');
   const [inspectionStarted, setInspectionStarted] = useState(false);
   const [enableCalculator, setEnableCalculator] = useState(false);
-  const { insert:addPolicy, update:updatePolicy } = usePolicyStorage();
+  const { insert:addPolicy } = usePolicyStorage();
   const { insert, update:updateInspectionData } = useInspectionStorage();
   const { userData: customerData, update:updateCustomerData, fetch:fetchCustomerData } = useCustomerStorage();
   const [idv, setIDV] = useState(null);
@@ -66,9 +65,10 @@ export default function NewInspection({ id }) {
   const onSimulationEnd = (_avgValues) => {
     setInspectionStarted(false);
     setEnableCalculator(true)
-    const idv = calculatePreHarvest(_avgValues, preInspectionIDV)
-    updateInspectionData(inspectionId, idv)
-    setIDV(idv)
+    const idvCalcualte =  calculatePreHarvest(_avgValues, preInspectionIDV)
+    const recomadations = getRecommanation(_avgValues);
+    updateInspectionData(inspectionId, {recomadations, ...idvCalcualte})
+    setIDV({recomadations, ...idvCalcualte})
   }
   const calculateIDV = () => {
     const {farmArea, expectedYeild, expectedMarketPrice, coveragePeriod} = customerData;
@@ -77,24 +77,43 @@ export default function NewInspection({ id }) {
       customerId: id,
       farmArea, expectedYeild, expectedMarketPrice, coveragePeriod, ...idv
     }, (policyId) =>{
-      updateCustomerData(id, {policyAssociated:policyId})
       updateInspectionData(inspectionId, {policyAssociated:policyId})
-      router.push(`/customer/`)
+      updateCustomerData(id, {policyAssociated:policyId})
+      router.push(`/customer/${id}/policy/${policyId}`)
     })
   }
 
 
   const renderRecomandatios = () => {
-    return (recommendation ? <Grid item xs={12} className={classes.sliderBase}>
-      <Box >
-        <Alert severity="info" className={classes.alert}>This is the recommendation for the farmer.
-      <Button variant="outlined" color="secondary">
-            Notify
-      </Button>
-        </Alert>
-      </Box>
-    </Grid> : null)
+    const recomStr = idv?.recomadations;
+    if(recomStr) {
+      const recommendation = recomStr.split("##");
+      return (
+        <Grid item xs={12} className={classes.sliderBase}>
+            <Typography
+                component="h6"
+                variant="h6"
+                color="inherit"
+                gutterBottom
+              >
+                Recommendation(s) based on Inspection
+              </Typography> 
+              <Button variant="outlined" color="secondary">Notify</Button>
+          <Box >
+            {recommendation.map(item=>(
+
+              <Alert severity="info" className={classes.alert}>
+                {item}
+              </Alert>
+            )
+            )}
+          </Box>
+        </Grid>
+      )
+    } 
+    return null;
   }
+
   return (
     <Box>
       <Container className={classes.topShift}>
@@ -106,8 +125,7 @@ export default function NewInspection({ id }) {
               color="inherit"
               gutterBottom
             >
-              Inspection with Droan
-              
+              Inspection with Drone
             <Typography
               component="span"
               variant="h6"
@@ -117,7 +135,7 @@ export default function NewInspection({ id }) {
               {inspectionId && ` (${inspectionId})`}
             </Typography>
             </Typography>
-            {enableCalculator && preInspectionIDV && 
+            {idv && 
             <>
               <Typography
                 component="h6"
@@ -133,7 +151,7 @@ export default function NewInspection({ id }) {
                 color="inherit"
                 gutterBottom
               >
-                IDV after Inspection : 120000 Rs.
+                IDV after Inspection : {idv.IDV} Rs.
               </Typography> 
               <Typography
                 component="h6"
@@ -141,7 +159,7 @@ export default function NewInspection({ id }) {
                 color="inherit"
                 gutterBottom
               >
-                Single Premium : 3000 Rs. per month
+                Single Premium : {idv.premium} Rs.
               </Typography>
               </>
             }
@@ -165,7 +183,7 @@ export default function NewInspection({ id }) {
           {renderRecomandatios()}
           {(inspectionStarted || enableCalculator) && <Grid item xs={12} className={classes.sliderBase}>
             
-            <DoranDataTable
+            <DroneDataTable
               customerId={id}
               inspectionId={inspectionId}
               inspectionStarted={inspectionStarted}

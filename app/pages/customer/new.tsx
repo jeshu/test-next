@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
-import Select from '@material-ui/core/Select';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
@@ -40,12 +39,15 @@ export default function NewCustomer() {
   const [mobile, setMobile] = useState('');
   const [location, setLocation] = useState('');
   const [address, setAddress] = useState('');
+  const [pincode, setPincode] = useState('');
   const [experience, setExperience] = useState('');
   const [cropType, setCropType] = useState('');
   const [farmArea, setFarmArea] = useState('');
   const [expectedYeild, setExpectedYeild] = useState('');
   const [expectedMarketPrice, setExpectedMarketPrice] = useState('');
   const [coveragePeriod, setCoveragePeriod] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
 
   const styles = useStyles();
   return (
@@ -105,11 +107,8 @@ export default function NewCustomer() {
               <RadioGroup aria-label="gender" name="gender1" value={gender} onChange={(e) => { setGender(e.target.value) }}>
                 <FormControlLabel value="female" control={<Radio />} label="Female" />
                 <FormControlLabel value="male" control={<Radio />} label="Male" />
-                <FormControlLabel value="other" control={<Radio />} label="Other" />
-                <FormControlLabel value="disabled" disabled control={<Radio />} label="(Disabled option)" />
               </RadioGroup>
             </FormControl>
-            <Box pb={2.5} />
             <TextField
               value={cropType}
               onChange={(e) => setCropType(e.target.value)}
@@ -124,6 +123,14 @@ export default function NewCustomer() {
               onChange={(e) => setAddress(e.target.value)}
               className="form-control"
               label="Address"
+              fullWidth={true}
+              required
+            />
+            <TextField
+              value={pincode}
+              onChange={(e) => setPincode(e.target.value)}
+              className="form-control"
+              label="Pincode"
               fullWidth={true}
               required
             />
@@ -151,7 +158,7 @@ export default function NewCustomer() {
               onChange={(e) => setFarmArea(e.target.value)}
               className="form-control"
               type='number'
-              label="Farm Area"
+              label="Farm Area (in acres)"
               fullWidth={true}
               required
             />
@@ -161,7 +168,7 @@ export default function NewCustomer() {
               onChange={(e) => setExpectedYeild(e.target.value)}
               className="form-control"
               type='number'
-              label="Expected Yeild"
+              label="Expected Yeild (in qntl/acre)"
               fullWidth={true}
               required
             />
@@ -171,7 +178,7 @@ export default function NewCustomer() {
               onChange={(e) => setExpectedMarketPrice(e.target.value)}
               type='number'
               className="form-control"
-              label="Expected market price"
+              label="Expected market price (Rs./Kg)"
               fullWidth={true}
               required
             />
@@ -181,7 +188,26 @@ export default function NewCustomer() {
               onChange={(e) => setCoveragePeriod(e.target.value)}
               className="form-control"
               type='number'
-              label="Experience"
+              label="Coverage Period (months)"
+              fullWidth={true}
+              required
+            />
+            <Box pb={2.5} />
+            
+            <TextField
+              value={latitude}
+              onChange={(e) => setLatitude(e.target.value)}
+              className="form-control"
+              label="Latitude"
+              fullWidth={true}
+              required
+            />
+            <Box pb={2.5} />            
+            <TextField
+              value={longitude}
+              onChange={(e) => setLongitude(e.target.value)}
+              className="form-control"
+              label="Longitude"
               fullWidth={true}
               required
             />

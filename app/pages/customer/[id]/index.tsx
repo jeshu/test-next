@@ -20,8 +20,7 @@ export default function CustomerDetails({ id }) {
       <Hero 
         title={personalinfo?.name} 
         subtext={`User Id: ${personalinfo?.userId ?? ''}`} 
-        ctalink={{ label: 'Policy information', url: `/policy/${id}` }} 
-        ctaSecLink={{ label: 'Request Inspection', url: `/customer/${id}/inspection/new` }} 
+        ctalink={{ label: 'Request Inspection', url: `/customer/${id}/inspection/new` }} 
       />
       <PersonalInfo {...personalinfo} />
       <Box>

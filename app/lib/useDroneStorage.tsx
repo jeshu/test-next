@@ -2,22 +2,23 @@ import { useState, useContext, createContext } from 'react';
 import azure from 'azure-storage';
 import { uid } from 'uid';
 
-type DroanStorageProps = {
+type DroneStorageProps = {
   data: []
-  clearData(): null
-  fetch(customerId: string, inspectionId: string): null
-  insert(inspectionData: any): null
-  update(inspectionData: any): null
+  error: string
+  clearData(): void
+  fetch(customerId: string, inspectionId: string): void
+  insert(inspectionData: any): void
+  update(inspectionData: any): void
 }
 
-const DroanStorageContext = createContext<Partial<DroanStorageProps>>({});
+const DroneStorageContext = createContext<Partial<DroneStorageProps>>({});
 
-export function DroanStorageProvider({ children }) {
-  const droanData = useProvideDroanStorage()
-  return <DroanStorageContext.Provider value={droanData}>{children}</DroanStorageContext.Provider>
+export function DroneStorageProvider({ children }) {
+  const droanData = useProvideDroneStorage()
+  return <DroneStorageContext.Provider value={droanData}>{children}</DroneStorageContext.Provider>
 }
-export const useDroanStorage = () => {
-  return useContext(DroanStorageContext);
+export const useDroneStorage = () => {
+  return useContext(DroneStorageContext);
 };
 
 function dataParser(data: any) {
@@ -38,14 +39,14 @@ function dataParser(data: any) {
   return parsedData;
 };
 
-function useProvideDroanStorage() {
+function useProvideDroneStorage():DroneStorageProps {
 
-  const [droanData, setDroanData] = useState(null);
+  const [droanData, setDroneData] = useState(null);
   const [error, setError] = useState('');
 
 
   function clearData() {
-    setDroanData(null);
+    setDroneData(null);
   }
 
   const fetch = (customerId: string, inspectionId: string) => {
@@ -56,7 +57,7 @@ function useProvideDroanStorage() {
     tableService.queryEntities('Field', tableQuery, null, function (error, result, response) {
       if (!error) {
         const parsedData = result.entries.map(dataParser);
-        setDroanData(parsedData)
+        setDroneData(parsedData)
       } else {
         setError(error.message)
       }

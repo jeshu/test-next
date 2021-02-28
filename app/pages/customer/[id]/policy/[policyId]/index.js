@@ -30,7 +30,7 @@ const __policyData = [{
   value: '2'
 }, {
   key:'IDV',
-  label: 'IDV',
+  label: 'Sum Assured',
   unit: 'Rs',
 }, {
   key:'premium',
