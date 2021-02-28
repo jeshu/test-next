@@ -130,8 +130,7 @@ export default function PolicyDetails({ id, policyId }) {
                 </Typography> 
             </Box>
         </Container>
-      </Box>
-      
+      </Box>      
       <Box>
         <InspectionTable customerId={id} />
       </Box>

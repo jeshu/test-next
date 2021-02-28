@@ -14,7 +14,7 @@ export const calculatePostHarvest = (data: any, sumAssured) => {
   const _sum = parseFloat(sumAssured);
   let idv = (_sum * _HighQualityCrop / 100) +
     (_sum * _LowQualityCrop / 100) * LOW_QUALITY_ADJUSTMENT;
-  return { IDV: idv }
+  return { IDV: (idv).toFixed(2) }
 }
 
 export const getBaseIDV = (data:any) => {

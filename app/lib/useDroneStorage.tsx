@@ -52,7 +52,7 @@ function useProvideDroneStorage():DroneStorageProps {
   const fetch = (customerId: string, inspectionId: string) => {
     const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
     const tableQuery = new azure.TableQuery()
-      .where('PartitionKey == ?string?', `${customerId}-${inspectionId}`)
+      .where('inspectionId == ?string?', `${inspectionId}`)
 
     tableService.queryEntities('Field', tableQuery, null, function (error, result, response) {
       if (!error) {

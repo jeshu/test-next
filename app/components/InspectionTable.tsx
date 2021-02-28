@@ -62,7 +62,7 @@ const InspectionTable = ({ customerId, policyId = '', isInspectionPage = false }
   const policyLink = (policyAssociated) => {
     return <Link href={`/customer/${customerId}/policy/${policyAssociated}`}>{policyAssociated}</Link>
   }
-  const rows: any = list && list.sort((a:any, b:any)=> (b.Timestamp > a.Timestamp)? 1 : -1 )
+  const rows: any = list && list.sort((a:any, b:any)=> (new Date(b.Timestamp) > new Date(a.Timestamp))? 1 : -1 )
     .reduce((acc: any, item: any) => {
     const data = {
       inspectionId: item.inspectionId,

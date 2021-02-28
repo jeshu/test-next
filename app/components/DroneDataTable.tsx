@@ -49,7 +49,7 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
   const { data, fetch, insert } = useDroneStorage()
   const classes = useStyles();
   const [avgValues, setAvgValues] = useState(null)
-  const rows: any = data && data.sort((a: any, b: any) => (b.Timestamp > a.Timestamp) ? 1 : -1)
+  const rows: any = data && data.sort((a:any, b:any)=> (new Date(b.Timestamp) > new Date(a.Timestamp))? 1 : -1 )
     .reduce((acc: any = [], row: any) => {
       delete row.isDone;
       acc.push(row)
@@ -127,7 +127,7 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
               <TableRow>
                 <TableCell align='center'>Image</TableCell>
                 {rows && rows[0] && Object.keys(rows[0]).map((_key, index) => (
-                  <TableCell key={`${_key}-${index}`} align={index === 0 ? 'left' : 'center'}>{_key.toUpperCase()}</TableCell>
+                  <TableCell key={`${_key}-${index}`} align={index === 0 ? 'left' : 'center'}>{_key}</TableCell>
                 ))}
               </TableRow>
             </TableHead>
