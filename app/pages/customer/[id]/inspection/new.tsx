@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Alert from '@material-ui/lab/Alert';
 import DroneDataTable from 'components/DroneDataTable';
-import Link from 'next/link';
+import Link from '@material-ui/core/Link';
 import {useRouter} from 'next/router';
 import { useInspectionStorage } from 'lib/useInspectionData';
 import { useCustomerStorage } from 'lib/useCustomerData';
@@ -105,7 +105,7 @@ export default function NewInspection({ id }) {
 
   const renderRecomandatios = () => {
     const recomStr = idv?.recomadations;
-    if(recomStr) {
+    if(recomStr && !inspectionStarted) {
       const recommendation = recomStr.split("##");
       return (
         <Grid item xs={12} className={classes.sliderBase}>
@@ -118,7 +118,7 @@ export default function NewInspection({ id }) {
               >
                 Recommendation(s) based on Inspection
               </Typography> 
-              <Button variant="outlined" color="secondary">Notify</Button>
+              <Button component="a" href={`mailto:?&subject=Drone%20Argo%20Insurence | Recommendations ;&body=Recommendations%0A%0A${recommendation.join('%0A%0A')}`} variant="outlined" color="secondary">Notify</Button>
           </Box>
           <Box >
             {recommendation.map(item=>(
