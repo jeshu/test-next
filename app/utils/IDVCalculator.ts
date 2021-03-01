@@ -2,7 +2,7 @@ export const PREMIUM_RATE = 2
 const LOW_QUALITY_ADJUSTMENT = 0.5
 
 export const calculatePreHarvest = (data: any, preInspectionIDV, rate: number) => {
-  const _Cultivatedland = parseFloat(data.Cultivatedland);
+  const _Cultivatedland = parseFloat(`${data.CultivatedLand}`);
   let idv = preInspectionIDV * _Cultivatedland / 100;
   let premium = ((rate || PREMIUM_RATE) / 100) * idv;
   return { IDV: idv, premium }
@@ -39,6 +39,9 @@ export const getRecommanation = (avgValues) => {
   if(parseFloat(avgValues.WindSpeed) > 11) {
     recommendation.push('Cover your plants with overturned pots, bowls, buckets, or other appropriately-sized containers to keep them from suffering wind and rain damage. Be sure to weigh down the coverings in order to hold them in place–rocks, cement blocks, and bricks will work just fine')
   }
+  if(avgValues?.Weather?.toLowerCase() === 'rain') {
+    recommendation.push('Cover your plants with overturned pots, bowls, buckets, or other appropriately-sized containers to keep them from suffering rain damage. Be sure to weigh down the coverings in order to hold them in place–rocks, cement blocks, and bricks will work just fine')
+  }
 
   return recommendation.join('##');
 }
@@ -52,7 +55,9 @@ export const averageFieldData = (data: any = []) => {
         }
         acc[key] += parseFloat(row[key]);
       } else {
-        acc[key] = ''
+        if(row[key]) {
+          acc[key] = row[key] 
+        }
       }
     }
     return acc

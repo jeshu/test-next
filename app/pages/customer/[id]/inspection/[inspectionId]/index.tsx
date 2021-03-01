@@ -70,15 +70,15 @@ export default function NewInspection({ id, inspectionId }) {
   }, [policyData])
 
   const startInspection = () => {
-    console.log(inspectionData.policyAssociated);
-
     insertInspection({
       IDV: 0,
       customerId: id,
       policyAssociated: inspectionData.policyAssociated
     }, (_mInspectionId) => {
+      setClaimPending(true);
       setNewInspectionId(_mInspectionId)
       setInspectionStarted(true);
+      setEnableCalculator(false)
     });
   };
 

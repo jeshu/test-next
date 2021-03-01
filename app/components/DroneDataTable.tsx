@@ -46,22 +46,33 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulationEnd }) => {
-  const { data, fetch, insert } = useDroneStorage()
+  const { data:droneData, fetch, insert } = useDroneStorage()
   const classes = useStyles();
   const [avgValues, setAvgValues] = useState(null)
+  const [data, setData] = useState(null)
+  useEffect(()=>{
+    droneData && setData(droneData)
+  }, [droneData])
   const rows: any = data && data.sort((a:any, b:any)=> (new Date(b.Timestamp) > new Date(a.Timestamp))? 1 : -1 )
     .reduce((acc: any = [], row: any) => {
+      if(row.isDone == true) {
+        return acc;
+      }
       delete row.isDone;
       acc.push(row)
       return acc
     }, []) || [];
   useEffect(() => {
-    const avg = averageFieldData(rows)
-    setAvgValues(avg)
+    if(data) {
+      const avg = averageFieldData(rows)
+      setAvgValues(avg)
+    }
   }, [data])
 
   const [fetchCounter, setFetchCounter] = useState(0)
   useEffect(() => {
+    console.log('helllo....', inspectionStarted, fetchCounter);
+    
     setTimeout(() => {
       if (inspectionStarted === true) {
         fetch(customerId, inspectionId)
@@ -71,41 +82,35 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
       }
     }, 3000)
     if (fetchCounter === 0) {
+      setData(null);
       fetch(customerId, inspectionId)
     }
   }, [inspectionStarted, fetchCounter])
-  // const [counter, setCounter] = useState(0);
+  
   useEffect(() => {
     if (inspectionStarted === true) {
       const lastData = data && data.find((item: any) => item.isDone === 'true')
-      if (lastData ) { //|| counter > 20
+      console.log(data);
+      
+      if (lastData || data && data.length >= 45) { 
         onSimulationEnd(avgValues)
-      } else {
-        // setTimeout(() => {
-        //   insert({
-        //     Cultivatedland: Math.round(10 + (Math.random() * 10)),
-        //     UnFertileLand: Math.round(10 + (Math.random() * 10)),
-        //     OtherAreas: Math.round(10 + (Math.random() * 10)),
-        //     HighQualityCrop: Math.round(10 + (Math.random() * 10)),
-        //     LowQualityCrop: Math.round(10 + (Math.random() * 10)),
-        //     DamageArea: Math.round(10 + (Math.random() * 10)),
-        //     Temperature: Math.round(33 + (Math.random() * 10)),
-        //     Humidity: Math.round(80 + (Math.random() * 10)),
-        //     WindSpeed: Math.round(38 + (Math.random() * 10)),
-        //     Moisture: Math.round(14 + (Math.random() * 10)),
-        //     DroneHeight: Math.round(10 + (Math.random() * 10)),
-        //     DroneCameraResolution: Math.round(10 + (Math.random() * 10)),
-        //     customerId,
-        //     inspectionId,
-        //     isDone: counter > 20 ? 'true' : 'false'
-        //   })
-        //   setCounter(counter + 1);
-        // }, 1000)
       }
     }
 
-  }, [data, inspectionStarted]) //counter
+  }, [data, inspectionStarted])
 
+  const rowHead = [
+    'Image',
+    'Timestamp',
+    'CultivatedLand',
+    'HighQualityCrop',
+    'LowQualityCrop',
+    'DamageArea',
+    'OtherAreas',
+    'UnFertileLand',
+    'Weather',
+    'WindSpeed'
+  ]
 
   return (
     data && data.length > 0 ?
@@ -125,30 +130,30 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
           <Table className={classes.table} aria-label="simple table" stickyHeader={true}>
             <TableHead>
               <TableRow>
-                <TableCell align='center'>Image</TableCell>
-                {rows && rows[0] && Object.keys(rows[0]).map((_key, index) => (
-                  (_key !== 'fileName') && <TableCell key={`${_key}-${index}`} align={index === 0 ? 'left' : 'center'}>{_key}</TableCell>
+                {rowHead && rowHead.map((_key, index) => (
+                  <TableCell key={`${_key}-${index}`} align={index === 0 ? 'left' : 'center'}>{_key}</TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody className={classes.tableBody}>
               <TableRow>
                 <TableCell >Avg Values</TableCell>
-                {avgValues && Object.values(avgValues).map((_value, index) => (
-                  <TableCell key={`${_value}-${index}`} align={index === 0 ? 'left' : 'center'} color={'primary'}>{_value}</TableCell>
+                {avgValues && rowHead.map((_key, index )=> (
+                  index > 0 && <TableCell key={`${avgValues[_key]}-${index}`} align={index === 0 ? 'left' : 'center'} color={'primary'}>{avgValues[_key]}</TableCell>
                 ))}
               </TableRow>
 
-              {rows.map((row) => (
+              {rows && rows.map((row) => (
                 <TableRow key={row.name}>
                   <TableCell align='center'>
                     <a href={row.fileName} target="_blank">
                       <img className={classes.image} src={row.fileName} />
                     </a>
                   </TableCell>
-                  {Object.values(row).map((_value, index) => (
-                    <TableCell key={`${_value}-${index}`} component="th" scope="row" align={index === 0 ? 'left' : 'center'}>
-                      {_value}
+                  {rowHead.map((_key, index) => (
+                    index > 0 && 
+                    <TableCell key={`${row[_key]}-${index}`} component="th" scope="row" align={index === 0 ? 'left' : 'center'}>
+                      {row[_key] && !isNaN(row[_key]) ? parseFloat(`${row[_key]}`).toFixed(2) : row[_key]}
                     </TableCell>)
                   )}
                 </TableRow>
