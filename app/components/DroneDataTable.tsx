@@ -127,14 +127,10 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
               <TableRow>
                 <TableCell align='center'>Image</TableCell>
                 {rows && rows[0] && Object.keys(rows[0]).map((_key, index) => (
-                  <TableCell key={`${_key}-${index}`} align={index === 0 ? 'left' : 'center'}>{_key}</TableCell>
+                  (_key !== 'fileName') && <TableCell key={`${_key}-${index}`} align={index === 0 ? 'left' : 'center'}>{_key}</TableCell>
                 ))}
               </TableRow>
             </TableHead>
-
-            <TableFooter>
-            </TableFooter>
-
             <TableBody className={classes.tableBody}>
               <TableRow>
                 <TableCell >Avg Values</TableCell>
@@ -146,8 +142,8 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
               {rows.map((row) => (
                 <TableRow key={row.name}>
                   <TableCell align='center'>
-                    <a href='https://images.unsplash.com/photo-1437252611977-07f74518abd7?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8d2hlYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&w=1000&q=80' target="_blank">
-                      <img className={classes.image} src="https://images.unsplash.com/photo-1437252611977-07f74518abd7?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MXx8d2hlYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&w=1000&q=80" />
+                    <a href={row.fileName} target="_blank">
+                      <img className={classes.image} src={row.fileName} />
                     </a>
                   </TableCell>
                   {Object.values(row).map((_value, index) => (
