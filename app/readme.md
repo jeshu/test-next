@@ -1,5 +1,5 @@
 
-## Webapp
+## Drone Squad Howathan Webapp
 This is the frontend application for the Drone Squad Howathan. This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app). Following are the main features developed.
 1. Customer Registration
 2. Inspection with Drone
