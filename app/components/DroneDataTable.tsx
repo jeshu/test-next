@@ -88,9 +88,7 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
   
   useEffect(() => {
     if (data && inspectionStarted === true) {
-      const lastData = data && data.find((item: any) => item.isDone === 'true')
-      console.log(data);
-      
+      const lastData = data && data.find((item: any) => item.isDone === true)
       if (lastData || data && data.length >= 45) { 
         onSimulationEnd(avgValues)
       }
