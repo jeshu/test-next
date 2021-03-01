@@ -68,11 +68,11 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
       setAvgValues(avg)
     }
   }, [data])
-
+  useEffect(() => {
+    setData(null)
+  }, [inspectionStarted])
   const [fetchCounter, setFetchCounter] = useState(0)
   useEffect(() => {
-    console.log('helllo....', inspectionStarted, fetchCounter);
-    
     setTimeout(() => {
       if (inspectionStarted === true) {
         fetch(customerId, inspectionId)
@@ -82,13 +82,12 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
       }
     }, 3000)
     if (fetchCounter === 0) {
-      setData(null);
       fetch(customerId, inspectionId)
     }
   }, [inspectionStarted, fetchCounter])
   
   useEffect(() => {
-    if (inspectionStarted === true) {
+    if (data && inspectionStarted === true) {
       const lastData = data && data.find((item: any) => item.isDone === 'true')
       console.log(data);
       
@@ -97,7 +96,7 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
       }
     }
 
-  }, [data, inspectionStarted])
+  }, [data])
 
   const rowHead = [
     'Image',

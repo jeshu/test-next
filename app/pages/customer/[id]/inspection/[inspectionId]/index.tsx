@@ -78,7 +78,6 @@ export default function NewInspection({ id, inspectionId }) {
       setClaimPending(true);
       setNewInspectionId(_mInspectionId)
       setInspectionStarted(true);
-      setEnableCalculator(false)
     });
   };
 
@@ -98,7 +97,7 @@ export default function NewInspection({ id, inspectionId }) {
 
   const convertToClaims = () => {
     updatePolicy(inspectionData.policyAssociated, {
-      claimAmount: idv.IDV
+      claimAmount: parseFloat(`${policyData.sumAssured}`) - parseFloat(`${idv.IDV}`)
     })
     router.push(`/customer/${id}/policy/${inspectionData.policyAssociated}`)
   }
