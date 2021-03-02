@@ -97,7 +97,7 @@ export default function NewInspection({ id, inspectionId }) {
 
   const convertToClaims = () => {
     updatePolicy(inspectionData.policyAssociated, {
-      claimAmount: parseFloat(`${policyData.sumAssured}`) - parseFloat(`${idv.IDV}`)
+      claimAmount: parseFloat(`${policyData.IDV}`) - parseFloat(`${idv.IDV}`)
     })
     router.push(`/customer/${id}/policy/${inspectionData.policyAssociated}`)
   }
