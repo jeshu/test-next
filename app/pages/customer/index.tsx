@@ -9,7 +9,6 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import ArrowForward from '@material-ui/icons/ArrowForward';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';

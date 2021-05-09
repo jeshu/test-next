@@ -2,6 +2,7 @@ import { useState, useContext, createContext } from 'react';
 import azure from 'azure-storage';
 import {uid} from 'uid';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 const TABLE_NAME = 'Users';
 type CustomerStorageProps = {
@@ -24,21 +25,21 @@ export const useCustomerStorage = () => {
   return useContext(CustomerStorageContext);
 };
 
-function dataParser(data: any) {
-  const parsedData = {
-    id: uid()
-  };
-  for (const key in data) {
-    if(key.toLowerCase().search(/(rowkey)|(partitionkey)|(.metadata)/) === -1) {
-      if(data[key]['$'] === 'Edm.DateTime') {
-        parsedData[key] = data[key]['_'].toLocaleString()
-      } else {
-        parsedData[key] = data[key]['_'];
-      }
-    }
-  }
-  return parsedData;
-};
+// function dataParser(data: any) {
+//   const parsedData = {
+//     id: uid()
+//   };
+//   for (const key in data) {
+//     if(key.toLowerCase().search(/(rowkey)|(partitionkey)|(.metadata)/) === -1) {
+//       if(data[key]['$'] === 'Edm.DateTime') {
+//         parsedData[key] = data[key]['_'].toLocaleString()
+//       } else {
+//         parsedData[key] = data[key]['_'];
+//       }
+//     }
+//   }
+//   return parsedData;
+// };
 
 function useProvideCustomerStorage(): CustomerStorageProps {
   const router = useRouter();
@@ -50,60 +51,90 @@ function useProvideCustomerStorage(): CustomerStorageProps {
   const fetch = (userId:string) => {
     setError('')
     setUserData(null)
-    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    const tableQuery = new azure.TableQuery().where('userId == ?string?', userId)
 
-    tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
-      if (!error) {
-        const parsedData = result.entries.map(dataParser);
-        setUserData(parsedData[0])
-
-      } else {
+    axios.get(`${process.env.NEXT_PUBLIC_CUSTOMER_SERVICE}/customer/get/${userId}`)
+    .then((response) => {
+      const parsedData = response.data; //result.entries.map(dataParser);
+      setCustomerData(parsedData)
+      router.push('/customer');
+    }).catch((error)=>{
         setError(error.message)
-      }
     });
+
+
+    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    // const tableQuery = new azure.TableQuery().where('userId == ?string?', userId)
+
+    // tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
+    //   if (!error) {
+    //     const parsedData = result.entries.map(dataParser);
+    //     setUserData(parsedData[0])
+
+    //   } else {
+    //     setError(error.message)
+    //   }
+    // });
   }
 
   const fetchAll = () => {
     setError('')
-    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    const tableQuery = new azure.TableQuery().top(20)
-
-    tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
-      if (!error) {
-        const parsedData = result.entries.map(dataParser);
-        setCustomerData(parsedData)
-
-      } else {
+    axios.get(`${process.env.NEXT_PUBLIC_CUSTOMER_SERVICE}/customer/get`, userData)
+    .then((response) => {
+      const parsedData = response.data; //result.entries.map(dataParser);
+      setCustomerData(parsedData)
+      router.push('/customer');
+    }).catch((error)=>{
         setError(error.message)
-      }
     });
+
+    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    // const tableQuery = new azure.TableQuery().top(20)
+    // tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
+    //   if (!error) {
+    //     const parsedData = result.entries.map(dataParser);
+    //     setCustomerData(parsedData)
+
+    //   } else {
+    //     setError(error.message)
+    //   }
+    // });
   }
 
   const insert = (userData:any) => {
-    setError('')
-    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    const entGen = azure.TableUtilities.entityGenerator;
-    for (const key in userData) {
-      userData[key] = entGen.String(userData[key])
-    }
-    const task = {
-      PartitionKey: entGen.String('users'),
-      RowKey: entGen.String(uid(16)),
-      userId: entGen.String(uid()),
-      ...userData,
-      inspectionPending: entGen.String('true'),
-      policyAssociated: entGen.String(''),
-      inspectionAssociated: entGen.String('')
-    };
-    tableService.insertEntity(TABLE_NAME, task,  (error, result) => {
-      if(!error){
-        // Entity inserted
+    setError('');
+    userData['userId'] = uid();
+    userData['inspectionPending'] = 'true';
+    userData['policyAssociated'] = '';
+    userData['inspectionAssociated'] = '';
+    
+    axios.post(`${process.env.NEXT_PUBLIC_CUSTOMER_SERVICE}/customer/save`, userData)
+    .then((response) => {
         router.push('/customer');
-      } else {
+    }).catch((error)=>{
         setError(error.message)
-      }
     });
+    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    // const entGen = azure.TableUtilities.entityGenerator;
+    // for (const key in userData) {
+    //   userData[key] = entGen.String(userData[key])
+    // }
+    // const task = {
+    //   PartitionKey: entGen.String('users'),
+    //   RowKey: entGen.String(uid(16)),
+    //   userId: entGen.String(uid()),
+    //   ...userData,
+    //   inspectionPending: entGen.String('true'),
+    //   policyAssociated: entGen.String(''),
+    //   inspectionAssociated: entGen.String('')
+    // };
+    // tableService.insertEntity(TABLE_NAME, task,  (error, result) => {
+    //   if(!error){
+    //     // Entity inserted
+    //     router.push('/customer');
+    //   } else {
+    //     setError(error.message)
+    //   }
+    // });
   }
   const update = (userId:string, data:any) => {
     setError('')

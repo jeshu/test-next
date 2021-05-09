@@ -2,6 +2,7 @@ import { useState, useContext, createContext } from 'react';
 import azure from 'azure-storage';
 import { uid } from 'uid';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 const TABLE_NAME = 'Policies';
 type PolicyStorageProps = {
@@ -46,83 +47,114 @@ const useProvidePolicyStorage = (): PolicyStorageProps => {
   const [error, setError] = useState('');
 
   const fetch = (policyId:string) => {
-    setPolicyData(null)
-    setError('')
-    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    const tableQuery = new azure.TableQuery().where('policyId == ?string?', policyId)
-
-    tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
-      if (!error) {
-        const parsedData = result.entries.map(dataParser);
+    setPolicyData(null);
+    setError('');
+    
+    axios.get(`${process.env.NEXT_PUBLIC_POLICY_SERVICE}/policy/get/${policyId}`)
+    .then((response) => {
+      const parsedData = response.data; //result.entries.map(dataParser);
         setPolicyData(parsedData[0])
-      } else {
+    }).catch((error)=>{
         setError(error.message)
-      }
     });
+
+
+
+    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    // const tableQuery = new azure.TableQuery().where('policyId == ?string?', policyId)
+
+    // tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
+    //   if (!error) {
+    //     const parsedData = result.entries.map(dataParser);
+    //     setPolicyData(parsedData[0])
+    //   } else {
+    //     setError(error.message)
+    //   }
+    // });
   }
   const fetchAll = (customerId:string) => {
     setPolicyList(null)
     setError('')
-    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    const tableQuery = new azure.TableQuery().where('customerId == ?string?', customerId)
-
-    tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
-      if (!error) {
-        const parsedData = result.entries.map(dataParser);
-        setPolicyList(parsedData)
-      } else {
+    
+    axios.get(`${process.env.NEXT_PUBLIC_POLICY_SERVICE}/policy/get/`)
+    .then((response) => {
+      const parsedData = response.data; //result.entries.map(dataParser);
+      setPolicyList(parsedData)
+    }).catch((error)=>{
         setError(error.message)
-      }
     });
+
+    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    // const tableQuery = new azure.TableQuery().where('customerId == ?string?', customerId)
+
+    // tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
+    //   if (!error) {
+    //     const parsedData = result.entries.map(dataParser);
+    //     setPolicyList(parsedData)
+    //   } else {
+    //     setError(error.message)
+    //   }
+    // });
   }
   const insert = (policyData:any, callback?:Function) => {
-    setError('')
-    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    const entGen = azure.TableUtilities.entityGenerator;
-    for (const key in policyData) {
-      policyData[key] = entGen.String(policyData[key])
-    }
-    const policyId = uid()
-    const task = {
-      PartitionKey: entGen.String('Policy'),
-      RowKey: entGen.String(uid(16)),
-      policyId: entGen.String(policyId),
-      ...policyData,
-    };
-    tableService.insertEntity(TABLE_NAME, task, (error, result) => {
-      if (!error) {
-        // Entity inserted
-        callback(policyId)
+    setError('');
 
-      } else {
+    const policyId = uid();
+    policyData['policyId'] = policyId
+    axios.post(`${process.env.NEXT_PUBLIC_POLICY_SERVICE}/policy/save`, policyData)
+    .then((response) => {
+      callback(policyId)
+    }).catch((error)=>{
         setError(error.message)
-      }
     });
+
+
+    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    // const entGen = azure.TableUtilities.entityGenerator;
+    // for (const key in policyData) {
+    //   policyData[key] = entGen.String(policyData[key])
+    // }
+    // const policyId = uid()
+    // const task = {
+    //   PartitionKey: entGen.String('Policy'),
+    //   RowKey: entGen.String(uid(16)),
+    //   policyId: entGen.String(policyId),
+    //   ...policyData,
+    // };
+    // tableService.insertEntity(TABLE_NAME, task, (error, result) => {
+    //   if (!error) {
+    //     // Entity inserted
+    //     callback(policyId)
+
+    //   } else {
+    //     setError(error.message)
+    //   }
+    // });
   }
   const update = (policyId:string, policyData:any) => {
     setError('')
-    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    const entGen = azure.TableUtilities.entityGenerator;
-    const tableQuery = new azure.TableQuery()
-      .where('policyId == ?string?', policyId)
+    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    // const entGen = azure.TableUtilities.entityGenerator;
+    // const tableQuery = new azure.TableQuery()
+    //   .where('policyId == ?string?', policyId)
 
-    tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
-      if (!error) {
-        const task = result.entries[0]
-        for(const key in policyData) {
-          task[key] = entGen.String(`${policyData[key]}`);
-        }
-        tableService.replaceEntity(TABLE_NAME, task, (error, result) => {
-          if (!error) {
-            console.log('value updated')
-          } else {
-            setError(error.message)
-          }
-        });
-      } else {
-        setError(error.message)
-      }
-    });
+    // tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
+    //   if (!error) {
+    //     const task = result.entries[0]
+    //     for(const key in policyData) {
+    //       task[key] = entGen.String(`${policyData[key]}`);
+    //     }
+    //     tableService.replaceEntity(TABLE_NAME, task, (error, result) => {
+    //       if (!error) {
+    //         console.log('value updated')
+    //       } else {
+    //         setError(error.message)
+    //       }
+    //     });
+    //   } else {
+    //     setError(error.message)
+    //   }
+    // });
   }
 
 
