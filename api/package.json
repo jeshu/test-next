@@ -1,0 +1,15 @@
+{
+  "name": "@droan-app/api",
+  "version": "1.0.0",
+  "description": "server for droan api",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jeshuBrij",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
