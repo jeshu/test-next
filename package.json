@@ -2,12 +2,14 @@
   "name": "droan-app",
   "version": "1.0.0",
   "description": "some practice with next framework, with auth and some other pages, also try to use mongoDb with typegoose",
-  "main": "index.js",
-  "scripts": {
-    "start": "",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "index.js",  
+  "private": true,
   
+  "scripts": {
+    "build": "yarn workspace @droan-app/webapp run build",
+    "start": "yarn workspace @droan-app/api run start",
+    "dev": "yarn workspace @droan-app/api run dev"
+  },
   "workspaces": [
     "api",
     "webapp"
