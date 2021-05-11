@@ -1,5 +1,5 @@
 import { useState, useContext, createContext } from 'react';
-import azure from 'azure-storage';
+// import azure from 'azure-storage';
 import { uid } from 'uid';
 import { useRouter } from 'next/router';
 
@@ -50,89 +50,89 @@ function useProvideInspectionStorage():InspectionStorageProps {
   const fetch = (inspectionId: string) => {
     setError('')
     setInspectionData(null)
-    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    const tableQuery = new azure.TableQuery().where('inspectionId == ?string?', inspectionId)
+    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    // const tableQuery = new azure.TableQuery().where('inspectionId == ?string?', inspectionId)
 
-    tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
-      if (!error) {
-        const parsedData = result.entries.map(dataParser);
-        setInspectionData(parsedData[0])
-      } else {
-        setError(error.message)
-      }
-    });
+    // tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
+    //   if (!error) {
+    //     const parsedData = result.entries.map(dataParser);
+    //     setInspectionData(parsedData[0])
+    //   } else {
+    //     setError(error.message)
+    //   }
+    // });
   }
 
   const fetchAll = (customerId: string, policyId?: string) => {
     setError('')
-    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    const tableQuery = policyId ? new azure.TableQuery()
-      .where('customerId == ?string? && policyId == ?string?', customerId, policyId)
-      : new azure.TableQuery()
-        .where('customerId == ?string?', customerId)
+    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    // const tableQuery = policyId ? new azure.TableQuery()
+    //   .where('customerId == ?string? && policyId == ?string?', customerId, policyId)
+    //   : new azure.TableQuery()
+    //     .where('customerId == ?string?', customerId)
 
-    tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
-      if (!error) {
-        const parsedData = result.entries.map(dataParser);
-        setList(parsedData)
-      } else {
-        setError(error.message)
-      }
-    });
+    // tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
+    //   if (!error) {
+    //     const parsedData = result.entries.map(dataParser);
+    //     setList(parsedData)
+    //   } else {
+    //     setError(error.message)
+    //   }
+    // });
   }
 
   const insert = (inspectionData: any, callback?: Function) => {
     setError('')
-    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    const entGen = azure.TableUtilities.entityGenerator;
-    for (const key in inspectionData) {
-      inspectionData[key] = entGen.String(inspectionData[key])
-    }
-    const inspectionId = uid()
-    const task = {
-      PartitionKey: entGen.String('users'),
-      RowKey: entGen.String(uid(16)),
-      inspectionId: entGen.String(inspectionId),
-      policyAssociated: entGen.String(''),
-      ...inspectionData,
-    };
-    tableService.insertEntity(TABLE_NAME, task, (error, result) => {
-      if (!error) {
-        // Entity inserted
-        callback(inspectionId)
+    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    // const entGen = azure.TableUtilities.entityGenerator;
+    // for (const key in inspectionData) {
+    //   inspectionData[key] = entGen.String(inspectionData[key])
+    // }
+    // const inspectionId = uid()
+    // const task = {
+    //   PartitionKey: entGen.String('users'),
+    //   RowKey: entGen.String(uid(16)),
+    //   inspectionId: entGen.String(inspectionId),
+    //   policyAssociated: entGen.String(''),
+    //   ...inspectionData,
+    // };
+    // tableService.insertEntity(TABLE_NAME, task, (error, result) => {
+    //   if (!error) {
+    //     // Entity inserted
+    //     callback(inspectionId)
 
-      } else {
-        setError(error.message)
-      }
-    });
+    //   } else {
+    //     setError(error.message)
+    //   }
+    // });
   }
   const update = (inspectionId: string, data: any) => {
     setError('')
     if(!inspectionId) {
       return
     }
-    const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    const entGen = azure.TableUtilities.entityGenerator;
-    const tableQuery = new azure.TableQuery()
-      .where('inspectionId == ?string?', inspectionId)
+    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
+    // const entGen = azure.TableUtilities.entityGenerator;
+    // const tableQuery = new azure.TableQuery()
+    //   .where('inspectionId == ?string?', inspectionId)
 
-    tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
-      if (!error) {
-        const task = result.entries[0]
-        for(const key in data) {
-          task[key] = entGen.String(`${data[key]}`);
-        }
-        tableService.replaceEntity(TABLE_NAME, task, (error, result) => {
-          if (!error) {
-            console.log('value updated')
-          } else {
-            setError(error.message)
-          }
-        });
-      } else {
-        setError(error.message)
-      }
-    });
+    // tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
+    //   if (!error) {
+    //     const task = result.entries[0]
+    //     for(const key in data) {
+    //       task[key] = entGen.String(`${data[key]}`);
+    //     }
+    //     tableService.replaceEntity(TABLE_NAME, task, (error, result) => {
+    //       if (!error) {
+    //         console.log('value updated')
+    //       } else {
+    //         setError(error.message)
+    //       }
+    //     });
+    //   } else {
+    //     setError(error.message)
+    //   }
+    // });
 
   }
 

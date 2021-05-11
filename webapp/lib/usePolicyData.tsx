@@ -1,5 +1,5 @@
 import { useState, useContext, createContext } from 'react';
-import azure from 'azure-storage';
+// import azure from 'azure-storage';
 import { uid } from 'uid';
 import { useRouter } from 'next/router';
 import axios from 'axios';
