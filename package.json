@@ -10,6 +10,7 @@
     "start": "yarn workspace @droan-app/api run start",
     "dev": "yarn workspace @droan-app/api run dev"
   },
+  "type": "module",
   "workspaces": [
     "api",
     "webapp"

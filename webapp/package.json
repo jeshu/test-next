@@ -2,6 +2,7 @@
   "name": "@droan-app/webapp",
   "version": "1.0.0",
   "description": "",
+  "main": "index.ts",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

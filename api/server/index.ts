@@ -1,6 +1,6 @@
 // import cors from 'cors';
-import express from 'express';
 import nextApp from '@droan-app/webapp';
+import express from 'express';
 
 const port = process.env.PORT || 3001;
 const handle = nextApp.getRequestHandler();
