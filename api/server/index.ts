@@ -2,7 +2,7 @@
 import nextApp from '@droan-app/webapp';
 import express from 'express';
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 const handle = nextApp.getRequestHandler();
 
 async function createServer() {
