@@ -54,50 +54,25 @@ function useProvideCustomerStorage(): CustomerStorageProps {
 
     axios.get(`${process.env.NEXT_PUBLIC_CUSTOMER_SERVICE}/customer/get/${userId}`)
     .then((response) => {
-      const parsedData = response.data; //result.entries.map(dataParser);
-      setCustomerData(parsedData)
-      router.push('/customer');
+      const parsedData = response.data; 
+      debugger
+      console.log(response.data.data);
+      
+      setUserData(parsedData.data);
     }).catch((error)=>{
         setError(error.message)
     });
-
-
-    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    // const tableQuery = new azure.TableQuery().where('userId == ?string?', userId)
-
-    // tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
-    //   if (!error) {
-    //     const parsedData = result.entries.map(dataParser);
-    //     setUserData(parsedData[0])
-
-    //   } else {
-    //     setError(error.message)
-    //   }
-    // });
   }
 
   const fetchAll = () => {
     setError('')
     axios.get(`${process.env.NEXT_PUBLIC_CUSTOMER_SERVICE}/customer/get`, userData)
     .then((response) => {
-      const parsedData = response.data; //result.entries.map(dataParser);
-      setCustomerData(parsedData)
-      router.push('/customer');
+      const parsedData = response.data; 
+      setCustomerData(parsedData.data);
     }).catch((error)=>{
         setError(error.message)
     });
-
-    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    // const tableQuery = new azure.TableQuery().top(20)
-    // tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
-    //   if (!error) {
-    //     const parsedData = result.entries.map(dataParser);
-    //     setCustomerData(parsedData)
-
-    //   } else {
-    //     setError(error.message)
-    //   }
-    // });
   }
 
   const insert = (userData:any) => {

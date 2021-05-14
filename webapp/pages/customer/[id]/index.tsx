@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import Container from '@material-ui/core/Container';
 import Hero from 'components/Hero';
 import PersonalInfo from 'components/PersonalInfo';
 import React from 'react';
@@ -19,7 +18,7 @@ export default function CustomerDetails({ id }) {
     <>
       <Hero 
         title={personalinfo?.name} 
-        subtext={`User Id: ${personalinfo?.userId ?? ''}`} 
+        subtext={`User Id: ${personalinfo?.id ?? ''}`} 
         ctalink={{ label: 'Request Inspection', url: `/customer/${id}/inspection/new` }} 
       />
       <PersonalInfo {...personalinfo} />

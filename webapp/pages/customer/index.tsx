@@ -51,6 +51,8 @@ export default function Customer() {
 
   useEffect(() => {
     if (data) {
+      console.log(data);
+      
       setNewCustomer(data.filter((c: any) => !c.policyAssociated))
       setPolicyHolders(data.filter((c: any) => !!c.policyAssociated))
       console.log(data);
@@ -78,7 +80,7 @@ export default function Customer() {
       {(!newCustomer || newCustomer.length === 0) && noData()}
       <List className={classes.root}>
         {newCustomer && newCustomer.map((item, index) =>
-          <Box key={item.userId}>
+          <Box key={item.id}>
             <ListItem alignItems="flex-start" key={item.id}>
               <ListItemAvatar>
                 <Avatar alt={item.name} src={item.avtar} />
@@ -91,12 +93,12 @@ export default function Customer() {
                     variant="body2"
                     className={classes.inline}
                   >
-                    {item.userId}
+                    {item.id}
                   </Typography>
                 }
               />
               <ListItemSecondaryAction>
-                <Link href={`customer/${item.userId}`}>
+                <Link href={`customer/${item.id}`}>
                   <IconButton edge="end" aria-label="comments">
                     <ArrowForward />
                   </IconButton>

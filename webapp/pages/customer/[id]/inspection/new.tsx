@@ -13,6 +13,7 @@ import { useCustomerStorage } from 'lib/useCustomerData';
 import { usePolicyStorage } from 'lib/usePolicyData';
 import { makeStyles } from '@material-ui/core/styles';
 import { calculatePreHarvest, getRecommanation, getBaseIDV , PREMIUM_RATE} from 'utils/IDVCalculator';
+import { uid } from 'uid';
 
 const useStyles = makeStyles((theme) => ({
   topShift: {
@@ -57,12 +58,20 @@ export default function NewInspection({ id }) {
   const [inspectionStarted, setInspectionStarted] = useState(false);
   const [enableCalculator, setEnableCalculator] = useState(false);
   const { insert:addPolicy } = usePolicyStorage();
-  const { insert, update:updateInspectionData } = useInspectionStorage();
+  // const { insert, update:updateInspectionData } = useInspectionStorage();
   const { userData: customerData, update:updateCustomerData, fetch:fetchCustomerData } = useCustomerStorage();
   const [idv, setIDV] = useState(null);
-
+  const [ws, setWS] = useState(null);
+  
   useEffect(() => {
     fetchCustomerData(id);
+    const websocket = new WebSocket('ws://localhost:3625' );
+    websocket.onopen = function() {
+      setWS(websocket)
+    }
+    websocket.onmessage = function (res) {
+      console.log(res);
+    }
   }, [])
   useEffect(() =>{
     if(customerData) {
@@ -70,14 +79,11 @@ export default function NewInspection({ id }) {
     }
   }, [customerData])
 
-  const startInspection = () => {
-    insert({
-      IDV: 0,
-      customerId: id,
-    }, (inspectionId) => {
+  const startInspection = () => { 
+      const inspectionId = uid();
+      ws.send(`inspection|${inspectionId}`)
       setInspectionId(inspectionId)
       setInspectionStarted(true);
-    });
   };
 
   const onSimulationEnd = (_avgValues) => {
@@ -86,7 +92,7 @@ export default function NewInspection({ id }) {
     const idvCalcualte =  calculatePreHarvest(_avgValues, baseIDV, (parseFloat(customerData.premiumRate) || PREMIUM_RATE))
     const recomadations = getRecommanation(_avgValues);
     setIDV({recomadations, ...idvCalcualte})
-    updateInspectionData(inspectionId, {recomadations, ...idvCalcualte})
+    // updateInspectionData(inspectionId, {recomadations, ...idvCalcualte})
   }
   const calculateIDV = () => {
     const {farmArea, expectedYeild, expectedMarketPrice, coveragePeriod} = customerData;
@@ -96,7 +102,7 @@ export default function NewInspection({ id }) {
       baseIDV,
       farmArea, expectedYeild, expectedMarketPrice, coveragePeriod, ...idv
     }, (policyId) =>{
-      updateInspectionData(inspectionId, {policyAssociated:policyId, ...idv})
+      // updateInspectionData(inspectionId, {policyAssociated:policyId, ...idv})
       updateCustomerData(id, {policyAssociated:policyId})
       router.push(`/customer/${id}/policy/${policyId}`)
     })
@@ -211,7 +217,7 @@ export default function NewInspection({ id }) {
               Create policy
             </Button>
               <Button variant="outlined" color="secondary" style={{marginLeft:'1rem'}} onClick={()=>{
-                updateInspectionData(inspectionId, idv)
+                // updateInspectionData(inspectionId, idv)
               }}>
                 Save
               </Button>
