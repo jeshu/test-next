@@ -58,10 +58,12 @@ export default function NewInspection({ id }) {
   const [inspectionStarted, setInspectionStarted] = useState(false);
   const [enableCalculator, setEnableCalculator] = useState(false);
   const { insert:addPolicy } = usePolicyStorage();
-  // const { insert, update:updateInspectionData } = useInspectionStorage();
+  const { insert, update:updateInspectionData } = useInspectionStorage();
   const { userData: customerData, update:updateCustomerData, fetch:fetchCustomerData } = useCustomerStorage();
   const [idv, setIDV] = useState(null);
   const [ws, setWS] = useState(null);
+  const [droneData, setDroneData] = useState([]);
+  let data:any = [];
   
   useEffect(() => {
     fetchCustomerData(id);
@@ -69,10 +71,16 @@ export default function NewInspection({ id }) {
     websocket.onopen = function() {
       setWS(websocket)
     }
-    websocket.onmessage = function (res) {
-      console.log(res);
+    websocket.onmessage =  (res) => {
+      updateDroanData(JSON.parse(res.data));
+      console.log('res.data',res.data);
+      
     }
   }, [])
+  const updateDroanData = (newData) =>{
+    data = [...data, newData];
+    setDroneData([...data]);
+  }
   useEffect(() =>{
     if(customerData) {
       setBaseIDV(getBaseIDV(customerData));
@@ -88,22 +96,27 @@ export default function NewInspection({ id }) {
 
   const onSimulationEnd = (_avgValues) => {
     setInspectionStarted(false);
-    setEnableCalculator(true)
-    const idvCalcualte =  calculatePreHarvest(_avgValues, baseIDV, (parseFloat(customerData.premiumRate) || PREMIUM_RATE))
+    setEnableCalculator(true);
     const recomadations = getRecommanation(_avgValues);
-    setIDV({recomadations, ...idvCalcualte})
+    const customerId = customerData.id, propertyId = customerData?.properties[0]?.id;
+    
+    insert({id:inspectionId, customerId, propertyId, fieldDataList: droneData}, (data) => {
+
+      setIDV({recomadations, IDV:data.data.preHarvestIdv, premium:data.data.preHarvestPremium});
+      console.log(data);
+    })
     // updateInspectionData(inspectionId, {recomadations, ...idvCalcualte})
   }
   const calculateIDV = () => {
-    const {farmArea, expectedYeild, expectedMarketPrice, coveragePeriod} = customerData;
+    // const {farmArea, expectedYeild, expectedMarketPrice, coveragePeriod} = customerData;
     console.log(customerData)
     addPolicy({
       customerId: id,
-      baseIDV,
-      farmArea, expectedYeild, expectedMarketPrice, coveragePeriod, ...idv
+      inspectionId,
+      propertyId:customerData.properties[0].id,
     }, (policyId) =>{
       // updateInspectionData(inspectionId, {policyAssociated:policyId, ...idv})
-      updateCustomerData(id, {policyAssociated:policyId})
+      // updateCustomerData(id, {policyAssociated:policyId})
       router.push(`/customer/${id}/policy/${policyId}`)
     })
   }
@@ -228,8 +241,7 @@ export default function NewInspection({ id }) {
           {(inspectionStarted || enableCalculator) && <Grid item xs={12} className={classes.sliderBase}>
             
             <DroneDataTable
-              customerId={id}
-              inspectionId={inspectionId}
+              droneData={droneData}
               inspectionStarted={inspectionStarted}
               onSimulationEnd={onSimulationEnd}
             />

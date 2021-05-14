@@ -55,28 +55,28 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-const InspectionTable = ({ customerId, policyId = '', isInspectionPage = false }) => {
-  const { list, fetchAll } = useInspectionStorage()
+const InspectionTable = ({ customerId, list, policyAssociated, isInspectionPage = false }) => {
+  // const { list, fetchAll } = useInspectionStorage();
   const classes = useStyles();
 
-  const policyLink = (policyAssociated) => {
+  const policyLink = ({customerId, }) => {
     return <Link href={`/customer/${customerId}/policy/${policyAssociated}`}>{policyAssociated}</Link>
   }
   const rows: any = list && list.sort((a:any, b:any)=> (new Date(b.Timestamp) > new Date(a.Timestamp))? 1 : -1 )
     .reduce((acc: any, item: any) => {
     const data = {
-      inspectionId: item.inspectionId,
-      timeStamp: item.Timestamp,
-      IDV: item.IDV,
-      policy: policyLink(item.policyAssociated)
+      inspectionId: item.id,
+      IDV: item.preHarvestPremium,
+      policy: policyLink(item)
     }
     acc.push(data)
     return acc;
   }, []) || [];
 
   useEffect(() => {
-    fetchAll(customerId, policyId)
-  }, [customerId, policyId]);
+
+    // fetchAll(customerId, policyId)
+  }, []);
 
 
   return (

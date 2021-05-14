@@ -53,8 +53,9 @@ export default function Customer() {
     if (data) {
       console.log(data);
       
-      setNewCustomer(data.filter((c: any) => !c.policyAssociated))
-      setPolicyHolders(data.filter((c: any) => !!c.policyAssociated))
+      setNewCustomer(data.filter((c: any) => c?.properies?.find((prop: any) => !!prop?.policy?.id)))
+      setPolicyHolders(data.filter((c: any) => !c?.properies?.find((prop: any) => !!prop?.policy?.id)))
+      // setPolicyHolders(data.filter((c: any) => !!c.policyAssociated))
       console.log(data);
     }
   }, [data])
@@ -129,11 +130,11 @@ export default function Customer() {
                     className={classes.inline}
                     color="textPrimary"
                   >
-                    {item.userId}
+                    {item.id}
                   </Typography>
                 }
               />
-              <Link href={`customer/${item.userId}`}>
+              <Link href={`customer/${item.id}`}>
                 <ListItemSecondaryAction>
                   <IconButton edge="end" aria-label="comments">
                     <ArrowForward />

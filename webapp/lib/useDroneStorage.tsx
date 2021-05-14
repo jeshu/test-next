@@ -21,24 +21,6 @@ export const useDroneStorage = () => {
   return useContext(DroneStorageContext);
 };
 
-function dataParser(data: any) {
-  const parsedData: any = {
-    id: uid()
-  };
-  for (const key in data) {
-    if (key.toLowerCase().search(/(rowkey)|(partitionkey)|(.metadata)/) === -1) {
-      if (data[key]['$'] === 'Edm.DateTime') {
-        parsedData[key] = data[key]['_'].toLocaleString()
-      } else {
-        parsedData[key] = data[key]['_'];
-      }
-    }
-  }
-  delete parsedData.customerId;
-  delete parsedData.inspectionId;
-  return parsedData;
-};
-
 function useProvideDroneStorage():DroneStorageProps {
 
   const [droanData, setDroneData] = useState(null);
@@ -50,6 +32,7 @@ function useProvideDroneStorage():DroneStorageProps {
   }
 
   const fetch = (customerId: string, inspectionId: string) => {
+    setDroneData(null);
     // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
     // const tableQuery = new azure.TableQuery()
     //   .where('inspectionId == ?string?', `${inspectionId}`)

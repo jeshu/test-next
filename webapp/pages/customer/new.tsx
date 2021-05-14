@@ -27,8 +27,8 @@ export default function NewCustomer() {
     event.preventDefault();
     insert({
       name, email, age, gender, mobile, location,
-      address, experience, cropType, farmArea, expectedYeild,
-      expectedMarketPrice, coveragePeriod
+      address, experience, properties: [{premiumRate,cropName:cropType, farmArea, expectedYeild,
+      expectedMarketPrice, coveragePeriod, latitude, longitude}]
     });
   };
 

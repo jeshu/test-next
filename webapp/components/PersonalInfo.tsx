@@ -5,8 +5,9 @@ import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 
 function PersonalInfo({
-  email, age, gender, mobile, address, location, experience, cropType
+  email, age, gender, mobile, address, location, experience, properties
 }) {
+  const cropType = properties && properties[0]?.cropName;
   return (
     <Box>
       <Container>

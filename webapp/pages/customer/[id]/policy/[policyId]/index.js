@@ -52,18 +52,18 @@ const __policyData = [{
 
 export default function PolicyDetails({ id, policyId }) {
   const { userData, fetch } = useCustomerStorage();
-  const { policyData, fetch:fetchPolicy } = usePolicyStorage();
+  // const { policyData, fetch:fetchPolicy } = usePolicyStorage();
   const [personalinfo, setPersonalInfo] = useState(null);
   const [policyInfo, setPolicyInfo] = useState(null);
   useEffect(() => { 
-    fetchPolicy(policyId)
+    // fetchPolicy(policyId)
     fetch(id) 
-  }, [policyId])
+  }, [policyId]);
+
   useEffect(() => {
     setPersonalInfo(userData)
-  }, [userData])
-  useEffect(() => {
-    console.log(policyData);
+    
+    const policyData = userData?.properties[0];
     if(policyData) {
       const data = __policyData.map(item=>{
         if(item.key) 
@@ -72,8 +72,7 @@ export default function PolicyDetails({ id, policyId }) {
       });
       setPolicyInfo(data)
     }
-  }, [policyData])
-
+  }, [userData]);
 
   const classes = useStyles();
   return (
@@ -132,7 +131,11 @@ export default function PolicyDetails({ id, policyId }) {
         </Container>
       </Box>      
       <Box>
-        <InspectionTable customerId={id} />
+        <InspectionTable 
+          customerId={id} 
+          list={personalinfo?.properties[0]?.inspections} 
+          policyAssociated={personalinfo?.properties[0]?.policy?.id}
+        />
       </Box>
     </>
   );

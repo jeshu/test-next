@@ -12,7 +12,9 @@ export default function CustomerDetails({ id }) {
   useEffect(() => { fetch(id) }, [])
   useEffect(() => {
     setPersonalInfo(userData)
+    
   }, [userData])
+  console.log('personalinfo', personalinfo);
 
   return (
     <>
@@ -23,7 +25,11 @@ export default function CustomerDetails({ id }) {
       />
       <PersonalInfo {...personalinfo} />
       <Box>
-        <InspectionTable customerId={id} />
+        <InspectionTable 
+          customerId={personalinfo?.id} 
+          list={personalinfo?.properties[0]?.inspections} 
+          policyAssociated={personalinfo?.properties[0]?.policy?.id}
+        />
       </Box>
     </>
   );

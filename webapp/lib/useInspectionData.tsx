@@ -2,6 +2,7 @@ import { useState, useContext, createContext } from 'react';
 // import azure from 'azure-storage';
 import { uid } from 'uid';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 const TABLE_NAME = 'Inspections';
 type InspectionStorageProps = {
@@ -49,7 +50,7 @@ function useProvideInspectionStorage():InspectionStorageProps {
 
   const fetch = (inspectionId: string) => {
     setError('')
-    setInspectionData(null)
+    setInspectionData(null);
     // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
     // const tableQuery = new azure.TableQuery().where('inspectionId == ?string?', inspectionId)
 
@@ -82,7 +83,13 @@ function useProvideInspectionStorage():InspectionStorageProps {
   }
 
   const insert = (inspectionData: any, callback?: Function) => {
-    setError('')
+    setError('');
+    axios.post(`${process.env.NEXT_PUBLIC_INSPECTION_SERVICE}/inspection/save`, inspectionData)
+    .then((response) => {
+        callback({...response.data, id:inspectionData.id})
+    }).catch((error)=>{
+        setError(error.message)
+    });
     // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
     // const entGen = azure.TableUtilities.entityGenerator;
     // for (const key in inspectionData) {

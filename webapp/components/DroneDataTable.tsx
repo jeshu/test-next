@@ -7,7 +7,7 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
-import TableFooter from '@material-ui/core/TableFooter';
+// import TableFooter from '@material-ui/core/TableFooter';
 import TableRow from '@material-ui/core/TableRow';
 import { useDroneStorage } from 'lib/useDroneStorage';
 import { averageFieldData } from 'utils/IDVCalculator';
@@ -45,69 +45,55 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulationEnd }) => {
-  const { data:droneData, fetch, insert } = useDroneStorage()
+const DroneDataTable = ({ inspectionStarted, onSimulationEnd, droneData }) => {
+  // const { data:droneData, fetch, insert } = useDroneStorage()
   const classes = useStyles();
-  const [avgValues, setAvgValues] = useState(null)
-  const [data, setData] = useState(null)
-  useEffect(()=>{
+  const [avgValues, setAvgValues] = useState(droneData)
+  const [data, setData] = useState(droneData)
+  useEffect(() => {
     droneData && setData(droneData)
   }, [droneData])
-  const rows: any = data && data.sort((a:any, b:any)=> (new Date(b.Timestamp) > new Date(a.Timestamp))? 1 : -1 )
+
+  const rows: any = data && data
     .reduce((acc: any = [], row: any) => {
-      if(row.isDone == true) {
+      if (row.isDone === 'true') {
         return acc;
       }
       delete row.isDone;
       acc.push(row)
       return acc
     }, []) || [];
+  console.log(rows);
+
   useEffect(() => {
-    if(data) {
+    if (data) {
       const avg = averageFieldData(rows)
       setAvgValues(avg)
     }
   }, [data])
-  useEffect(() => {
-    setData(null)
-  }, [inspectionStarted])
-  const [fetchCounter, setFetchCounter] = useState(0)
-  useEffect(() => {
-    setTimeout(() => {
-      if (inspectionStarted === true) {
-        fetch(customerId, inspectionId)
-        setFetchCounter(fetchCounter + 1)
-      } else {
-        setFetchCounter(0)
-      }
-    }, 3000)
-    if (fetchCounter === 0) {
-      fetch(customerId, inspectionId)
-    }
-  }, [inspectionStarted, fetchCounter])
   
   useEffect(() => {
-    if (data && inspectionStarted === true) {
-      const lastData = data && data.find((item: any) => item.isDone === true)
-      if (lastData || data && data.length >= 45) { 
-        onSimulationEnd(avgValues)
-      }
+    if(inspectionStarted === true) {
+      setData(null)
     }
+  }, [inspectionStarted])
 
+  useEffect(() => {
+    if (data && inspectionStarted === true) {
+      const lastData = data && data.find((item: any) => item.isDone === 'true')
+      if(lastData) onSimulationEnd(avgValues)
+    }
   }, [data])
 
   const rowHead = [
-    'Image',
-    'Timestamp',
-    'CultivatedLand',
-    'HighQualityCrop',
-    'LowQualityCrop',
-    'DamageArea',
-    'OtherAreas',
-    'UnFertileLand',
-    'Weather',
-    'WindSpeed'
+    'fileName',
+    'cultivatedLand',
+    'inFertileLand',
+    'other',
+    'weather',
+    'windSpeed'
   ]
+  console.log(data);
 
   return (
     data && data.length > 0 ?
@@ -135,7 +121,7 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
             <TableBody className={classes.tableBody}>
               <TableRow>
                 <TableCell >Avg Values</TableCell>
-                {avgValues && rowHead.map((_key, index )=> (
+                {avgValues && rowHead.map((_key, index) => (
                   index > 0 && <TableCell key={`${avgValues[_key]}-${index}`} align={index === 0 ? 'left' : 'center'} color={'primary'}>{avgValues[_key]}</TableCell>
                 ))}
               </TableRow>
@@ -148,7 +134,7 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
                     </a>
                   </TableCell>
                   {rowHead.map((_key, index) => (
-                    index > 0 && 
+                    index > 0 &&
                     <TableCell key={`${row[_key]}-${index}`} component="th" scope="row" align={index === 0 ? 'left' : 'center'}>
                       {row[_key] && !isNaN(row[_key]) ? parseFloat(`${row[_key]}`).toFixed(2) : row[_key]}
                     </TableCell>)
@@ -161,7 +147,7 @@ const DroneDataTable = ({ customerId, inspectionId, inspectionStarted, onSimulat
       </Box>
       :
       <Box className={classes.noContentMsg}>
-        <FlightTakeoffIcon fontSize="large" color="primary"/>
+        <FlightTakeoffIcon fontSize="large" color="primary" />
         <Typography variant="h6" id="tableTitle" component="span">
           Preparing Drone to gather information
           </Typography>
