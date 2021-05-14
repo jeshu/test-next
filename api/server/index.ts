@@ -10,7 +10,7 @@ const redisPort: number = parseInt(process.env.REDIS_PORT as string) || 6379,
   // reidsPassword = process.env.REDIS_PASSWORD,
   WebSocketServer = WebSocket.Server,
   streamName = process.env.STREAM || 'inspection';
-// const STREAMS_KEY = "inspection";
+const STREAMS_KEY = "predictions_test";
 
 const port = process.env.PORT || 3000;
 const handle = nextApp.getRequestHandler();
@@ -32,10 +32,11 @@ async function createServer() {
     const readStream = function (ws: any) {
       console.log('redis stream read...')
       const rc: any = redis.createClient({ port: redisPort, host: redisHost });
-      const xreadStream = (endId: string) => rc.xread('Block', 2000, 'STREAMS', 'inspectiondata', endId, function (err: any, stream: any) {
+      const xreadStream = (endId: string) => rc.xread('Block', 20000, 'STREAMS', STREAMS_KEY, endId, function (err: any, stream: any) {
         if (err) {
           return console.error(err);
         }
+
         let lastId = '$'
         if (stream) {
           const streamLength = stream[0][1].length;
@@ -45,9 +46,10 @@ async function createServer() {
           for (let i = 0; i <= data.length; i += 2) {
             finalData[data[i]] = data[i + 1];
           }
+          console.log(finalData);
           ws.send(JSON.stringify(finalData));
+          xreadStream(lastId);
         }
-        xreadStream(lastId);
       });
       xreadStream('$');
     }
@@ -59,12 +61,16 @@ async function createServer() {
         function (err: any, res: any) {
           if (err) { console.log(err) };
           console.log(res);
-          mock_inspection_data('inspectiondata', rc);
+          mock_inspection_data(STREAMS_KEY, rc);
           readStream(ws);
         });
     }
 
     const wss = new WebSocketServer({ port: 3625 });
+    wss.on("error", (err: any) => {
+      console.log("Caught flash policy server socket error: ")
+      console.log(err.stack)
+    });
 
     wss.on('connection', function (ws) {
       ws.on('message', function (message: string) {
@@ -102,8 +108,8 @@ async function mock_inspection_data(inspectionId: string, rc: any) {
       "weather", "Rain",
       "damageArea", "0",
       "water", "0",
-      "highQualityCrop", '0',
-      "lowQualityCrop", '0',
+      "highQualityCrop", '80',
+      "lowQualityCrop", '20',
       "windSpeed", "5",
       function (err: any) {
         if (err) { console.log(err) };
@@ -118,10 +124,10 @@ async function mock_inspection_data(inspectionId: string, rc: any) {
     "weather", "Rain",
     "damageArea", "0",
     "windSpeed", "5",
-    "highQualityCrop", '0',
-    "lowQualityCrop", '0',
+    "highQualityCrop", '80',
+    "lowQualityCrop", '20',
     "water", "0",
-    "isDone", "true",
+    "isDone", "1",
     function (err: any) {
       if (err) { console.log(err) };
     });

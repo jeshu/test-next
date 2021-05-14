@@ -56,15 +56,14 @@ const DroneDataTable = ({ inspectionStarted, onSimulationEnd, droneData }) => {
 
   const rows: any = data && data
     .reduce((acc: any = [], row: any) => {
-      if (row.isDone === 'true') {
+      if (row.isDone === '1') {
         return acc;
       }
       delete row.isDone;
       acc.push(row)
       return acc
     }, []) || [];
-  console.log(rows);
-
+  
   useEffect(() => {
     if (data) {
       const avg = averageFieldData(rows)
@@ -80,7 +79,7 @@ const DroneDataTable = ({ inspectionStarted, onSimulationEnd, droneData }) => {
 
   useEffect(() => {
     if (data && inspectionStarted === true) {
-      const lastData = data && data.find((item: any) => item.isDone === 'true')
+      const lastData = data && data.find((item: any) => item.isDone === '1')
       if(lastData) onSimulationEnd(avgValues)
     }
   }, [data])
@@ -93,8 +92,7 @@ const DroneDataTable = ({ inspectionStarted, onSimulationEnd, droneData }) => {
     'weather',
     'windSpeed'
   ]
-  console.log(data);
-
+  
   return (
     data && data.length > 0 ?
       <Box>

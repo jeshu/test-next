@@ -26,30 +26,6 @@ export default function MyApp(props) {
     if (jssStyles && jssStyles.parentNode) {
       jssStyles.parentNode.removeChild(jssStyles);
     }
-    const ws = new WebSocket('ws://localhost:3625' );
-    // event emmited when connected
-    ws.onopen = function () {
-      console.log('websocket is connected ...')
-      // sending a send event to websocket server
-      ws.send('connected')
-    }
-    // event emmited when receiving message
-    ws.onmessage = function (ev) {
-      // const blb    = new Blob(["Lorem ipsum sit"], {type: "text/plain"});
-      // const reader = new FileReader();
-      // reader.addEventListener('loadend', (e:any) => {
-      //   const text = e.srcElement.result;
-      //   console.log(text);
-      // });
-      
-      // // Start reading the blob as text.
-      // reader.readAsText(ev.data);
-      console.log(ev.data);
-      
-      // let image:HTMLImageElement = document.querySelector('#images img') as HTMLImageElement;
-      // image.src = ev.data;
-    }
-
   }, []);
 
   return (

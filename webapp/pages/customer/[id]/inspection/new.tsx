@@ -58,8 +58,8 @@ export default function NewInspection({ id }) {
   const [inspectionStarted, setInspectionStarted] = useState(false);
   const [enableCalculator, setEnableCalculator] = useState(false);
   const { insert:addPolicy } = usePolicyStorage();
-  const { insert, update:updateInspectionData } = useInspectionStorage();
-  const { userData: customerData, update:updateCustomerData, fetch:fetchCustomerData } = useCustomerStorage();
+  const { insert } = useInspectionStorage();
+  const { userData: customerData, fetch:fetchCustomerData } = useCustomerStorage();
   const [idv, setIDV] = useState(null);
   const [ws, setWS] = useState(null);
   const [droneData, setDroneData] = useState([]);
@@ -73,14 +73,13 @@ export default function NewInspection({ id }) {
     }
     websocket.onmessage =  (res) => {
       updateDroanData(JSON.parse(res.data));
-      console.log('res.data',res.data);
-      
     }
   }, [])
   const updateDroanData = (newData) =>{
     data = [...data, newData];
     setDroneData([...data]);
   }
+
   useEffect(() =>{
     if(customerData) {
       setBaseIDV(getBaseIDV(customerData));
@@ -98,9 +97,10 @@ export default function NewInspection({ id }) {
     setInspectionStarted(false);
     setEnableCalculator(true);
     const recomadations = getRecommanation(_avgValues);
-    const customerId = customerData.id, propertyId = customerData?.properties[0]?.id;
+    const propertyId = customerData?.properties[0]?.id;
+    console.log(customerData);
     
-    insert({id:inspectionId, customerId, propertyId, fieldDataList: droneData}, (data) => {
+    insert({id:inspectionId, customerId:id, propertyId, fieldDataList: droneData}, (data) => {
 
       setIDV({recomadations, IDV:data.data.preHarvestIdv, premium:data.data.preHarvestPremium});
       console.log(data);

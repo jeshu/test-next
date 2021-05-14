@@ -38,7 +38,9 @@ function useProvideCustomerStorage(): CustomerStorageProps {
 
     axios.get(`${process.env.NEXT_PUBLIC_CUSTOMER_SERVICE}/customer/get/${userId}`)
     .then((response) => {
-      const parsedData = response.data; 
+      const parsedData = response.data;
+      console.log(response.data);
+       
       setUserData(parsedData.data);
     }).catch((error)=>{
         setError(error.message)

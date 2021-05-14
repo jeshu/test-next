@@ -53,8 +53,8 @@ export default function Customer() {
     if (data) {
       console.log(data);
       
-      setNewCustomer(data.filter((c: any) => c?.properies?.find((prop: any) => !!prop?.policy?.id)))
-      setPolicyHolders(data.filter((c: any) => !c?.properies?.find((prop: any) => !!prop?.policy?.id)))
+      setNewCustomer(data.filter((c: any) => c?.properties?.find((prop: any) => !prop?.policy?.id)))
+      setPolicyHolders(data.filter((c: any) => c?.properties?.find((prop: any) => prop?.policy?.id)))
       // setPolicyHolders(data.filter((c: any) => !!c.policyAssociated))
       console.log(data);
     }

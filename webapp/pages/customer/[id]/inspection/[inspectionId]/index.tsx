@@ -12,6 +12,8 @@ import { useRouter } from 'next/router';
 import { useInspectionStorage } from 'lib/useInspectionData';
 import { usePolicyStorage } from 'lib/usePolicyData';
 import { calculatePostHarvest, getRecommanation } from 'utils/IDVCalculator';
+import { useCustomerStorage } from 'lib/useCustomerData';
+import { uid } from 'uid';
 
 const useStyles = makeStyles((theme) => ({
   topShift: {
@@ -48,19 +50,42 @@ export default function NewInspection({ id, inspectionId }) {
   const [inspectionStarted, setInspectionStarted] = useState(false);
   const [enableCalculator, setEnableCalculator] = useState(false);
   const [claimPending, setClaimPending] = useState(true);
-  const { policyData, fetch: fetchPolicy, update: updatePolicy } = usePolicyStorage();
-  const { inspectionData, fetch: fetchInspectionData, insert: insertInspection, update: updateInspectionData } = useInspectionStorage();
+  const { userData: customerData, fetch:fetchCustomerData } = useCustomerStorage();
+  const { policyData, saveClaim } = usePolicyStorage();
+  const { insert: insertInspection, update: updateInspectionData } = useInspectionStorage();
   const [idv, setIDV] = useState(null);
+  const [ws, setWS] = useState(null);
+  const [droneData, setDroneData] = useState([]);
+  const [inspectionData, setInspectionData] = useState(null);
+  let data:any = [];
 
   useEffect(() => {
-    fetchInspectionData(inspectionId);
+    fetchCustomerData(id);
+    const websocket = new WebSocket('ws://localhost:3625' );
+    websocket.onopen = function() {
+      setWS(websocket)
+    }
+    websocket.onmessage =  (res) => {
+      updateDroanData(JSON.parse(res.data));
+    }
   }, [])
 
+  
+  const updateDroanData = (newData) =>{
+    data = [...data, newData];
+    setDroneData([...data]);
+  }
+
   useEffect(() => {
-    if (inspectionData) {
-      fetchPolicy(inspectionData.policyAssociated);
+    if (customerData) {
+      console.log(customerData);
+      const _inspectionData = customerData?.properties[0].inspections.find(i => i.id === inspectionId);
+      const _droneData = _inspectionData?.fieldDataList
+      setInspectionData(_inspectionData);
+      setDroneData(_droneData);
+      // fetchPolicy(inspectionData?.policyAssociated);
     }
-  }, [inspectionData])
+  }, [customerData])
 
   useEffect(() => {
     if (policyData)
@@ -70,23 +95,27 @@ export default function NewInspection({ id, inspectionId }) {
   }, [policyData])
 
   const startInspection = () => {
-    insertInspection({
-      IDV: 0,
-      customerId: id,
-      policyAssociated: inspectionData.policyAssociated
-    }, (_mInspectionId) => {
+    const inspectionId = uid();
+      ws.send(`inspection|${inspectionId}`)
       setClaimPending(true);
-      setNewInspectionId(_mInspectionId)
+      setNewInspectionId(inspectionId)
       setInspectionStarted(true);
-    });
   };
 
   const onSimulationEnd = (_avgValues) => {
     setInspectionStarted(false);
     setEnableCalculator(true);
     const recomadations = getRecommanation(_avgValues);
-    const idvCalcualte = calculatePostHarvest(_avgValues, policyData.IDV)
-    setIDV({ recomadations, ...idvCalcualte })
+    const idvCalcualte = calculatePostHarvest(_avgValues, 20000)
+    setIDV({ recomadations, ...idvCalcualte });
+    insertInspection({
+      id:newInspectionId, 
+      customerId:id, 
+      propertyId:customerData?.properties[0]?.id, 
+      fieldDataList: droneData}, (data) => {
+        setIDV({recomadations, IDV:data.data.preHarvestIdv, premium:data.data.preHarvestPremium});
+        console.log(data);
+      })
   }
 
   useEffect(() => {
@@ -96,10 +125,13 @@ export default function NewInspection({ id, inspectionId }) {
   }, [idv])
 
   const convertToClaims = () => {
-    updatePolicy(inspectionData.policyAssociated, {
-      claimAmount: parseFloat(`${policyData.IDV}`) - parseFloat(`${idv.IDV}`)
+    saveClaim({
+      customerId: id,
+      policyId: customerData?.properties[0].policy.id,
+      inspectionId: newInspectionId || inspectionId
+    }, (result) => {
+      router.push(`/customer/${id}/policy/${inspectionData.policyAssociated}`);
     })
-    router.push(`/customer/${id}/policy/${inspectionData.policyAssociated}`)
   }
 
   const renderRecomandatios = () => {
@@ -185,7 +217,7 @@ export default function NewInspection({ id, inspectionId }) {
               </Typography>}
             </>
 
-            {!claimPending && policyData &&
+            {!claimPending && inspectionData &&
               <>
                 <Typography
                   component="h6"
@@ -223,8 +255,7 @@ export default function NewInspection({ id, inspectionId }) {
           {renderRecomandatios()}
           <Grid item xs={12} className={classes.sliderBase}>
             <DroneDataTable
-              customerId={id}
-              inspectionId={newInspectionId || inspectionId}
+              droneData={droneData}
               inspectionStarted={inspectionStarted}
               onSimulationEnd={onSimulationEnd}
             />

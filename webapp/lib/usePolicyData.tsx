@@ -12,7 +12,7 @@ type PolicyStorageProps = {
   fetch(policyId: string): void
   fetchAll(customerId: string): void
   insert(policyData: any, callback: Function): void
-  update(policyId: string, policyData: any): void
+  saveClaim(claimData: any,callback: Function): void
 }
 
 const PolicyStorageContext = createContext<Partial<PolicyStorageProps>>({})
@@ -107,54 +107,16 @@ const useProvidePolicyStorage = (): PolicyStorageProps => {
     }).catch((error)=>{
         setError(error.message)
     });
-
-
-    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    // const entGen = azure.TableUtilities.entityGenerator;
-    // for (const key in policyData) {
-    //   policyData[key] = entGen.String(policyData[key])
-    // }
-    // const policyId = uid()
-    // const task = {
-    //   PartitionKey: entGen.String('Policy'),
-    //   RowKey: entGen.String(uid(16)),
-    //   policyId: entGen.String(policyId),
-    //   ...policyData,
-    // };
-    // tableService.insertEntity(TABLE_NAME, task, (error, result) => {
-    //   if (!error) {
-    //     // Entity inserted
-    //     callback(policyId)
-
-    //   } else {
-    //     setError(error.message)
-    //   }
-    // });
   }
-  const update = (policyId:string, policyData:any) => {
+  const saveClaim = (claimData:any, callback?: Function) => {
     setError('')
-    // const tableService = azure.createTableService(process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING);
-    // const entGen = azure.TableUtilities.entityGenerator;
-    // const tableQuery = new azure.TableQuery()
-    //   .where('policyId == ?string?', policyId)
-
-    // tableService.queryEntities(TABLE_NAME, tableQuery, null, function (error, result) {
-    //   if (!error) {
-    //     const task = result.entries[0]
-    //     for(const key in policyData) {
-    //       task[key] = entGen.String(`${policyData[key]}`);
-    //     }
-    //     tableService.replaceEntity(TABLE_NAME, task, (error, result) => {
-    //       if (!error) {
-    //         console.log('value updated')
-    //       } else {
-    //         setError(error.message)
-    //       }
-    //     });
-    //   } else {
-    //     setError(error.message)
-    //   }
-    // });
+    const policyId = uid();
+    axios.post(`${process.env.NEXT_PUBLIC_POLICY_SERVICE}/claim/save`, claimData)
+    .then((response) => {
+      callback(response)
+    }).catch((error)=>{
+        setError(error.message)
+    });
   }
 
 
@@ -165,7 +127,7 @@ const useProvidePolicyStorage = (): PolicyStorageProps => {
     fetch,
     fetchAll,
     insert,
-    update
+    saveClaim
   }
 
 }
