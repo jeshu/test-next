@@ -66,7 +66,7 @@ const InspectionTable = ({ customerId, list, policyAssociated, isInspectionPage 
     .reduce((acc: any, item: any) => {
     const data = {
       inspectionId: item.id,
-      IDV: item.preHarvestPremium,
+      IDV: item.postHarvestIdv || item.preHarvestIdv,
       policy: policyLink(item)
     }
     acc.push(data)

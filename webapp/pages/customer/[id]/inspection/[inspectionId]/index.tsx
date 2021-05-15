@@ -108,8 +108,6 @@ export default function NewInspection({ id, inspectionId }) {
     setInspectionStarted(false);
     setEnableCalculator(true);
     const recomadations = getRecommanation(_avgValues);
-    // const idvCalcualte = calculatePostHarvest(_avgValues, 20000)
-    // setIDV({ recomadations, ...idvCalcualte });
     insertInspection({
       id:newInspectionId, 
       customerId:id, 
