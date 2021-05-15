@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Paper from '@material-ui/core/Paper';
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
@@ -14,7 +14,6 @@ import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import ArrowForward from '@material-ui/icons/ArrowForward';
 import Link from 'next/link';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { useInspectionStorage } from 'lib/useInspectionData';
 
 const useStyles = makeStyles((theme: Theme) => ({
 
@@ -56,9 +55,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 const InspectionTable = ({ customerId, list, policyAssociated, isInspectionPage = false }) => {
-  // const { list, fetchAll } = useInspectionStorage();
   const classes = useStyles();
-
   const policyLink = ({customerId, }) => {
     return <Link href={`/customer/${customerId}/policy/${policyAssociated}`}>{policyAssociated}</Link>
   }
@@ -73,10 +70,6 @@ const InspectionTable = ({ customerId, list, policyAssociated, isInspectionPage 
     return acc;
   }, []) || [];
 
-  useEffect(() => {
-
-    // fetchAll(customerId, policyId)
-  }, []);
 
 
   return (

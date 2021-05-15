@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
-import Container from '@material-ui/core/Container';
 import Hero from 'components/Hero';
-import PersonalInfo from 'components/PersonalInfo';
 import React from 'react';
 import Box from '@material-ui/core/Box';
 import InspectionTable from 'components/InspectionTable';
@@ -23,7 +21,11 @@ export default function InspectionList({ id }) {
         ctalink={{ label: 'Policy information', url: `/policy/${id}` }} 
         ctaSecLink={{ label: 'Request Inspection', url: `/customer/${id}/inspection/new` }} 
       />
-        <InspectionTable customerId={id} isInspectionPage= {true}/>
+       <InspectionTable 
+          customerId={id} 
+          list={personalinfo?.properties[0]?.inspections} 
+          policyAssociated={personalinfo?.properties[0]?.policy?.id}
+        />
       <Box>
       </Box>
     </>

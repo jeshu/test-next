@@ -14,8 +14,6 @@ export default function CustomerDetails({ id }) {
     setPersonalInfo(userData)
     
   }, [userData])
-  console.log('personalinfo', personalinfo);
-
   return (
     <>
       <Hero 

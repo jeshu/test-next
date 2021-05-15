@@ -4,7 +4,6 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import { themeDark, themeLight } from "lib/theme";
 import { useEffect, useState } from "react";
 import { AuthProvider } from 'lib/useAuth';
-import { DroneStorageProvider } from 'lib/useDroneStorage';
 import { PolicyStorageProvider } from 'lib/usePolicyData';
 import { CustomerStorageProvider } from 'lib/useCustomerData';
 import { InspectionStorageProvider } from 'lib/useInspectionData';
@@ -33,14 +32,12 @@ export default function MyApp(props) {
       <CssBaseline />
       <CustomerStorageProvider>
         <InspectionStorageProvider>
-          <DroneStorageProvider>
             <PolicyStorageProvider>
               <AuthProvider>
                 {props.router.route !== '/' && <Header darkState={darkState} handleThemeChange={handleThemeChange} />}
                 <Component {...pageProps} />
               </AuthProvider>
             </PolicyStorageProvider>
-          </DroneStorageProvider>
         </InspectionStorageProvider>
       </CustomerStorageProvider>
     </ThemeProvider>

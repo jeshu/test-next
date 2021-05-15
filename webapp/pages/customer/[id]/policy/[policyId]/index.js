@@ -3,7 +3,6 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-
 import { makeStyles } from '@material-ui/core/styles';
 import Hero from 'components/Hero';
 import InspectionTable from 'components/InspectionTable';
@@ -51,11 +50,9 @@ const __policyData = [{
 
 export default function PolicyDetails({ id, policyId }) {
   const { userData, fetch } = useCustomerStorage();
-  // const { policyData, fetch:fetchPolicy } = usePolicyStorage();
   const [personalinfo, setPersonalInfo] = useState(null);
   const [policyInfo, setPolicyInfo] = useState(null);
   useEffect(() => { 
-    // fetchPolicy(policyId)
     fetch(id) 
   }, [policyId]);
 

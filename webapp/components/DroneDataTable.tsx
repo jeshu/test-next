@@ -7,9 +7,7 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
-// import TableFooter from '@material-ui/core/TableFooter';
 import TableRow from '@material-ui/core/TableRow';
-import { useDroneStorage } from 'lib/useDroneStorage';
 import { averageFieldData } from 'utils/IDVCalculator';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
@@ -89,6 +87,9 @@ const DroneDataTable = ({ inspectionStarted, onSimulationEnd, droneData }) => {
     'cultivatedLand',
     'inFertileLand',
     'other',
+    'highQualityCrop',
+    'lowQualityCrop',
+    'damageArea',
     'weather',
     'windSpeed'
   ]

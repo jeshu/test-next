@@ -52,7 +52,7 @@ export default function NewInspection({ id, inspectionId }) {
   const [claimPending, setClaimPending] = useState(true);
   const { userData: customerData, fetch:fetchCustomerData } = useCustomerStorage();
   const { saveClaim } = usePolicyStorage();
-  const { insert: insertInspection, update: updateInspectionData } = useInspectionStorage();
+  const { insert: insertInspection } = useInspectionStorage();
   const [idv, setIDV] = useState(null);
   const [ws, setWS] = useState(null);
   const [droneData, setDroneData] = useState([]);
@@ -118,18 +118,12 @@ export default function NewInspection({ id, inspectionId }) {
       })
   }
 
-  useEffect(() => {
-    if (idv) {
-      updateInspectionData(newInspectionId, idv)
-    }
-  }, [idv])
-
   const convertToClaims = () => {
     saveClaim({
       customerId: id,
       propertyId: customerData?.properties[0].id,
       inspectionId: newInspectionId || inspectionId
-    }, (result) => {
+    }, () => {
       router.push(`/customer/${id}/policy/${policyData.id}`);
     })
   }

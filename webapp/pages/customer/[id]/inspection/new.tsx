@@ -6,13 +6,12 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Alert from '@material-ui/lab/Alert';
 import DroneDataTable from 'components/DroneDataTable';
-import Link from '@material-ui/core/Link';
 import {useRouter} from 'next/router';
 import { useInspectionStorage } from 'lib/useInspectionData';
 import { useCustomerStorage } from 'lib/useCustomerData';
 import { usePolicyStorage } from 'lib/usePolicyData';
 import { makeStyles } from '@material-ui/core/styles';
-import { calculatePreHarvest, getRecommanation, getBaseIDV , PREMIUM_RATE} from 'utils/IDVCalculator';
+import { getRecommanation, getBaseIDV , PREMIUM_RATE} from 'utils/IDVCalculator';
 import { uid } from 'uid';
 
 const useStyles = makeStyles((theme) => ({

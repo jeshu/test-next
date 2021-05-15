@@ -6,11 +6,10 @@ import WebSocket from 'ws';
 import redis from 'redis';
 
 const redisPort: number = parseInt(process.env.REDIS_PORT as string) || 6379,
-  redisHost = process.env.REDIS_HOST || '40.117.227.179', //|| || ,
-  // reidsPassword = process.env.REDIS_PASSWORD,
+  redisHost = process.env.REDIS_HOST || '40.117.227.179',
   WebSocketServer = WebSocket.Server,
-  streamName = process.env.STREAM || 'inspection';
-const STREAMS_KEY = "predictions_test";
+  streamName = process.env.STREAM || 'inspection',
+  STREAMS_KEY = "predictions";
 
 const port = process.env.PORT || 3000;
 const handle = nextApp.getRequestHandler();
@@ -30,38 +29,40 @@ async function createServer() {
     });
 
     const readStream = function (ws: any) {
-      console.log('redis stream read...')
-      const rc: any = redis.createClient({ port: redisPort, host: redisHost });
-      const xreadStream = (endId: string) => rc.xread('Block', 20000, 'STREAMS', STREAMS_KEY, endId, function (err: any, stream: any) {
-        if (err) {
-          return console.error(err);
-        }
-
-        let lastId = '$'
-        if (stream) {
-          const streamLength = stream[0][1].length;
-          lastId = stream[0][1][streamLength - 1][0];
-          const data = stream[0][1][0][1];
-          const finalData: any = {};
-          for (let i = 0; i <= data.length; i += 2) {
-            finalData[data[i]] = data[i + 1];
+      try {
+        const rc: any = redis.createClient({ port: redisPort, host: redisHost });
+        const xreadStream = (endId: string) => rc.xread('Block', 120000, 'STREAMS', STREAMS_KEY, endId, function (err: any, stream: any) {
+          if (err) {
+            return console.error(err);
           }
-          console.log(finalData);
-          ws.send(JSON.stringify(finalData));
-          xreadStream(lastId);
-        }
-      });
-      xreadStream('$');
+
+          let lastId = '$'
+          if (stream) {
+            const streamLength = stream[0][1].length;
+            lastId = stream[0][1][streamLength - 1][0];
+            const data = stream[0][1][0][1];
+            const finalData: any = {};
+            for (let i = 0; i <= data.length; i += 2) {
+              finalData[data[i]] = data[i + 1];
+            }
+            finalData.water = '0';
+            console.log(finalData);
+            ws.send(JSON.stringify(finalData));
+            xreadStream(lastId);
+          }
+        });
+        xreadStream('$');
+      } catch (e: any) {
+        console.log(e);
+      }
     }
 
     function startInspection(inspectionId: string, ws: any) {
       const rc: any = redis.createClient({ port: redisPort, host: redisHost });
       rc.xadd(`${streamName}`, '*',
         'inspectionId', inspectionId,
-        function (err: any, res: any) {
+        function (err: any,) {
           if (err) { console.log(err) };
-          console.log(res);
-          mock_inspection_data(STREAMS_KEY, rc);
           readStream(ws);
         });
     }
@@ -84,55 +85,5 @@ async function createServer() {
     console.log(err);
   }
 }
-
-
-function sleep(time: number) {
-  return new Promise(resolve => setTimeout(resolve, time));
-}
-
-async function mock_inspection_data(inspectionId: string, rc: any) {
-
-  var sleep_time = 300;
-  var loop_nb = 20;
-
-  console.log(`\nThis program will send ${loop_nb} messages, every ${sleep_time}ms`);
-
-  for (var i = 0; i <= loop_nb; i++) {
-    console.log(`\tSending message ${i}`);
-    // produce the message
-    rc.xadd(inspectionId, '*',
-      "cultivatedLand", "98.92646074295044",
-      "inFertileLand", "0.0",
-      "other", "98.93871545791626",
-      "fileName", `https://droneredissg.blob.core.windows.net/droneimages/${i}.jpg`,
-      "weather", "Rain",
-      "damageArea", "0",
-      "water", "0",
-      "highQualityCrop", '80',
-      "lowQualityCrop", '20',
-      "windSpeed", "5",
-      function (err: any) {
-        if (err) { console.log(err) };
-      });
-    await sleep(sleep_time);
-  }
-  rc.xadd(inspectionId, '*',
-    "cultivatedLand", "98.92646074295044",
-    "inFertileLand", "0.0",
-    "other", "98.93871545791626",
-    "fileName", `https://droneredissg.blob.core.windows.net/droneimages/${i}.jpg`,
-    "weather", "Rain",
-    "damageArea", "0",
-    "windSpeed", "5",
-    "highQualityCrop", '80',
-    "lowQualityCrop", '20',
-    "water", "0",
-    "isDone", "1",
-    function (err: any) {
-      if (err) { console.log(err) };
-    });
-}
-
-// main();
 
 createServer();
