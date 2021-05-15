@@ -1,19 +1,13 @@
-FROM node:14
+FROM node:14.15.0
 
-WORKDIR /usr/src/app
-
+COPY . .
 COPY package.json .
 COPY yarn.lock .
 
-RUN yarn install
-RUN npm i
-RUN npm i tsc
-COPY . .
-
-RUN npm run dev
+RUN npm install -g yarn --force
+RUN yarn install --force
 
 
 CMD [ "yarn", "start" ]
 
 EXPOSE 3000
-EXPOSE 3625
