@@ -51,11 +51,12 @@ export default function NewInspection({ id, inspectionId }) {
   const [enableCalculator, setEnableCalculator] = useState(false);
   const [claimPending, setClaimPending] = useState(true);
   const { userData: customerData, fetch:fetchCustomerData } = useCustomerStorage();
-  const { policyData, saveClaim } = usePolicyStorage();
+  const { saveClaim } = usePolicyStorage();
   const { insert: insertInspection, update: updateInspectionData } = useInspectionStorage();
   const [idv, setIDV] = useState(null);
   const [ws, setWS] = useState(null);
   const [droneData, setDroneData] = useState([]);
+  const [policyData, setPolicyData] = useState(null);
   const [inspectionData, setInspectionData] = useState(null);
   let data:any = [];
 
@@ -80,16 +81,17 @@ export default function NewInspection({ id, inspectionId }) {
     if (customerData) {
       console.log(customerData);
       const _inspectionData = customerData?.properties[0].inspections.find(i => i.id === inspectionId);
+      _inspectionData.IDV = _inspectionData?.postHarvestIdv || _inspectionData?.preHarvestIdv;
       const _droneData = _inspectionData?.fieldDataList
       setInspectionData(_inspectionData);
+      setPolicyData(customerData?.properties[0].policy);
       setDroneData(_droneData);
-      // fetchPolicy(inspectionData?.policyAssociated);
     }
   }, [customerData])
 
   useEffect(() => {
     if (policyData)
-      if (policyData.claimAmount) {
+      if (policyData?.claimAmount) {
         setClaimPending(false)
       }
   }, [policyData])
@@ -106,14 +108,14 @@ export default function NewInspection({ id, inspectionId }) {
     setInspectionStarted(false);
     setEnableCalculator(true);
     const recomadations = getRecommanation(_avgValues);
-    const idvCalcualte = calculatePostHarvest(_avgValues, 20000)
-    setIDV({ recomadations, ...idvCalcualte });
+    // const idvCalcualte = calculatePostHarvest(_avgValues, 20000)
+    // setIDV({ recomadations, ...idvCalcualte });
     insertInspection({
       id:newInspectionId, 
       customerId:id, 
       propertyId:customerData?.properties[0]?.id, 
       fieldDataList: droneData}, (data) => {
-        setIDV({recomadations, IDV:data.data.preHarvestIdv, premium:data.data.preHarvestPremium});
+        setIDV({recomadations, IDV:data.data.postHarvestIdv, premium:data.data.preHarvestPremium});
         console.log(data);
       })
   }
@@ -127,10 +129,10 @@ export default function NewInspection({ id, inspectionId }) {
   const convertToClaims = () => {
     saveClaim({
       customerId: id,
-      policyId: customerData?.properties[0].policy.id,
+      propertyId: customerData?.properties[0].id,
       inspectionId: newInspectionId || inspectionId
     }, (result) => {
-      router.push(`/customer/${id}/policy/${inspectionData.policyAssociated}`);
+      router.push(`/customer/${id}/policy/${policyData.id}`);
     })
   }
 
@@ -188,14 +190,14 @@ export default function NewInspection({ id, inspectionId }) {
             </Typography>
 
             <>
-              {policyData && policyData.IDV &&
+              {policyData && policyData?.policySumAssured &&
                 <Typography
                   component="h6"
                   variant="h6"
                   color="inherit"
                   gutterBottom
                 >
-                  Sum Assured : {policyData.IDV} Rs.
+                  Sum Assured : {policyData.policySumAssured} Rs.
               </Typography>
               }
               <Typography
@@ -206,14 +208,14 @@ export default function NewInspection({ id, inspectionId }) {
               >
                 IDV after Inspection : {idv ? parseFloat(`${idv.IDV}`).toFixed(2) : inspectionData && parseFloat(inspectionData.IDV).toFixed(2)} Rs.
               </Typography>
-              {inspectionData?.premium &&
+              {policyData?.policyPremium &&
                 <Typography
                   component="h6"
                   variant="h6"
                   color="inherit"
                   gutterBottom
                 >
-                  Single Premium : {inspectionData && inspectionData.premium} Rs.
+                  Single Premium : {policyData?.policyPremium ?? '-'} Rs.
               </Typography>}
             </>
 
@@ -227,7 +229,7 @@ export default function NewInspection({ id, inspectionId }) {
                 >
                   Claim is settled at {policyData ? ` ${parseFloat(policyData.claimAmount).toFixed(2)} Rs.` : ''}
                 </Typography>
-                <Link href={`/customer/${id}/policy/${policyData.policyId}`}>
+                <Link href={`/customer/${id}/policy/${policyData.id}`}>
                   <Button variant="outlined" color="secondary">
                     Back to Policy
                 </Button>

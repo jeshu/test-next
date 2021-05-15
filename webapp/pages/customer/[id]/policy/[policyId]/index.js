@@ -8,7 +8,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Hero from 'components/Hero';
 import InspectionTable from 'components/InspectionTable';
 import {useCustomerStorage} from 'lib/useCustomerData';
-import {usePolicyStorage} from 'lib/usePolicyData';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 
 
@@ -29,11 +28,11 @@ const __policyData = [{
   unit: '%',
   value: '2'
 }, {
-  key:'IDV',
+  key:'policySumAssured',
   label: 'Sum Assured',
   unit: 'Rs',
 }, {
-  key:'premium',
+  key:'policyPremium',
   label: 'Single Premium',
   unit: 'Rs',
 }, {
@@ -41,7 +40,7 @@ const __policyData = [{
   label: 'Coverage Period',
   unit: 'months',
 }, {
-  key:'Timestamp',
+  key:'date',
   label: 'Policy commencement date',
 },{
   key:'claimAmount',
@@ -63,11 +62,16 @@ export default function PolicyDetails({ id, policyId }) {
   useEffect(() => {
     setPersonalInfo(userData)
     
-    const policyData = userData?.properties[0];
+    const policyData = {...userData?.properties[0], ...userData?.properties[0]?.policy};
     if(policyData) {
       const data = __policyData.map(item=>{
-        if(item.key) 
-          item.value = policyData[item.key] || '-'
+        if(item.key) {
+          if(item.key === 'date') {
+            item.value = (new Date(policyData[item.key])).toDateString();  
+          } else {
+            item.value = policyData[item.key] || '-'
+          }
+        }
         return item;
       });
       setPolicyInfo(data)

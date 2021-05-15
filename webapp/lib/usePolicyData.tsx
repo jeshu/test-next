@@ -110,8 +110,7 @@ const useProvidePolicyStorage = (): PolicyStorageProps => {
   }
   const saveClaim = (claimData:any, callback?: Function) => {
     setError('')
-    const policyId = uid();
-    axios.post(`${process.env.NEXT_PUBLIC_POLICY_SERVICE}/claim/save`, claimData)
+    axios.post(`${process.env.NEXT_PUBLIC_POLICY_SERVICE}/policy/claim`, claimData)
     .then((response) => {
       callback(response)
     }).catch((error)=>{
